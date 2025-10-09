@@ -23,7 +23,7 @@ export default defineConfig(({ command }) => ({
         maximumFileSizeToCacheInBytes: 4e6,
       },
       manifest: {
-        name: 'AS Web',
+        name: 'AssetStudio Web',
         short_name: 'AS Web',
         background_color: '#f4f4f5',
         theme_color: '#f4f4f5',

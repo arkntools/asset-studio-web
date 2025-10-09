@@ -39,7 +39,7 @@ const unityCNOptionsDialogRef = useTemplateRef('unityCNOptionsDialogRef');
 const addRepoSourceDialogRef = useTemplateRef('addRepoSourceDialogRef');
 
 const gotoGithub = () => {
-  openUrl('https://github.com/arkntools/as-web');
+  openUrl('https://github.com/arkntools/asset-studio-web');
 };
 
 const loadFiles = (list: FileList | null) => {

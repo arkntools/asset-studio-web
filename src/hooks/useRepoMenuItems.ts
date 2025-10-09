@@ -40,7 +40,7 @@ export const useRepoMenuItems = ({ dialogRef }: { dialogRef: Ref<InstanceType<ty
     {
       name: 'Help',
       handler: () => {
-        openUrl('https://github.com/arkntools/as-web/wiki/Repository');
+        openUrl('https://github.com/arkntools/asset-studio-web/wiki/Repository');
       },
       icon: () => IElHelp,
     },
