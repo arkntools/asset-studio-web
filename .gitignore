@@ -1,5 +1,5 @@
 # Dev
-/src/assets/*.ab
+/public/ab/*
 
 # Yalc
 .yalc
