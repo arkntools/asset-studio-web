@@ -9,7 +9,7 @@ For the repository feature, please check the [wiki](https://github.com/arkntools
 |                     **Image**                      |                      **Text**                      |
 | :------------------------------------------------: | :------------------------------------------------: |
 | [![](./docs/image.png)](./docs/image.png?raw=true) |  [![](./docs/text.png)](./docs/text.png?raw=true)  |
-|                     **Spine**                      |                     **Voice**                      |
+|                     **Spine**                      |                     **Audio**                      |
 | [![](./docs/spine.png)](./docs/spine.png?raw=true) | [![](./docs/voice.png)](./docs/voice.png?raw=true) |
 
 ## Development
