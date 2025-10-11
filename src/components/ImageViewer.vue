@@ -25,15 +25,14 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-button class="download-btn" type="info" @click="handleDownload"
-      ><el-icon :size="20"><i-el-download /></el-icon
-    ></el-button>
+    <DownloadButton @click="handleDownload" />
     <FullSizeLoading :loading="!src" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { saveAs } from 'file-saver';
+import DownloadButton from './DownloadButton.vue';
 import FullSizeLoading from './FullSizeLoading.vue';
 
 const { src, name } = defineProps<{
@@ -125,14 +124,5 @@ const handleDownload = () => {
   &-btn {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   }
-}
-
-.download-btn {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  padding: 0;
 }
 </style>

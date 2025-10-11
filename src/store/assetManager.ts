@@ -8,14 +8,6 @@ import { useSetting } from './setting';
 
 const { AssetManager } = wrap<typeof import('@/workers/assetManager')>(new AssetManagerWorker());
 
-AssetManager.setFsbToMp3(
-  proxy(async params => {
-    const { convertFsb, FsbConvertFormat } = await import('@arkntools/unity-js/audio');
-    const data = await convertFsb(params, FsbConvertFormat.MP3);
-    return transfer(data, [data.buffer]);
-  }),
-);
-
 const manager = new AssetManager();
 
 const pickExportDir = () => window.showDirectoryPicker({ id: 'export-assets', mode: 'readwrite' }).catch(console.error);
@@ -41,6 +33,26 @@ export const useAssetManager = defineStore('assetManager', () => {
   const isLoading = ref(false);
 
   const assetInfoMap = computed(() => new Map(assetInfos.value.map(info => [info.key, info])));
+
+  AssetManager.setFsbConverter(
+    proxy(async (params, isPreview) => {
+      const { convertFsb, FsbConvertFormat } = await import('@arkntools/unity-js/audio');
+      const data = await convertFsb(
+        params,
+        isPreview ? FsbConvertFormat.WAV : setting.data.fsbConvertFormat,
+        isPreview ? undefined : { vbrQuality: setting.data.fsbConvertVbrQuality as any },
+      );
+      return transfer(data, [data.buffer]);
+    }),
+  );
+
+  watch(
+    () => setting.data.fsbConvertFormat,
+    () => {
+      AssetManager.setFsbConvertFormat(setting.data.fsbConvertFormat);
+    },
+    { immediate: true },
+  );
 
   const canExport = ({ canExport }: AssetInfo) => canExport;
 

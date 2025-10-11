@@ -1,5 +1,6 @@
 import { AssetType, loadAssetBundle } from '@arkntools/unity-js';
 import type { AssetObject, Bundle, BundleLoadOptions } from '@arkntools/unity-js';
+import type { FsbConvertFormat } from '@arkntools/unity-js/audio';
 import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import { expose } from 'comlink';
 import { md5 as calcMd5 } from 'js-md5';
@@ -40,8 +41,12 @@ const THREAD_NUM = Math.max(navigator.hardwareConcurrency, 1);
 export class AssetManager {
   private bundleMap = new Map<string, Bundle>();
 
-  static setFsbToMp3(fsbToMp3: (typeof AudioClipLoader)['fsbToMp3']) {
-    AudioClipLoader.fsbToMp3 = fsbToMp3;
+  static setFsbConverter(fsbConverter: (typeof AudioClipLoader)['fsbConverter']) {
+    AudioClipLoader.fsbConverter = fsbConverter;
+  }
+
+  static setFsbConvertFormat(fsbConvertFormat: FsbConvertFormat) {
+    AudioClipLoader.convertFormat = fsbConvertFormat;
   }
 
   clear() {

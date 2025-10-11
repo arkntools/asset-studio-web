@@ -1,16 +1,21 @@
 import type { AudioClip, AudioClipGetResult } from '@arkntools/unity-js';
+import type { FsbConvertFormat } from '@arkntools/unity-js/audio';
 import { blobCache } from '../utils/cache';
 import type { CacheKey } from '../utils/cache';
 import { AssetLoader, PreviewType } from './default';
 import type { AssetExportItem, PreviewDetail } from './default';
 
 const mimeMap: Record<string, string | undefined> = {
+  wav: 'audio/wav',
   mp3: 'audio/mpeg',
   m4a: 'audio/mp4',
 };
 
+const getMimeType = (format: string) => mimeMap[format] ?? `audio/${format}`;
+
 export class AudioClipLoader extends AssetLoader<AudioClip> {
-  static fsbToMp3: (params: AudioClipGetResult) => Promise<Uint8Array<ArrayBuffer>>;
+  static fsbConverter: (params: AudioClipGetResult, isPreview?: boolean) => Promise<Uint8Array<ArrayBuffer>>;
+  static convertFormat: FsbConvertFormat;
 
   private get cacheKey(): CacheKey {
     return {
@@ -23,13 +28,15 @@ export class AudioClipLoader extends AssetLoader<AudioClip> {
   }
 
   override async export(): Promise<AssetExportItem[] | null> {
+    const { convertFormat } = AudioClipLoader;
     let blob = blobCache.get(this.cacheKey)?.blob;
-    if (!blob) {
+
+    if (convertFormat !== 'wav' || !blob) {
       blob = await this.getAudioBlob();
       if (!blob) return null;
     }
 
-    const ext = this.object.format === 'fsb' ? 'mp3' : this.object.format;
+    const ext = this.object.format === 'fsb' ? convertFormat : this.object.format;
 
     return [
       {
@@ -48,7 +55,7 @@ export class AudioClipLoader extends AssetLoader<AudioClip> {
     const cachedUrl = blobCache.get(key)?.url;
     if (cachedUrl) return cachedUrl;
 
-    const blob = await this.getAudioBlob();
+    const blob = await this.getAudioBlob(true);
     if (!blob) return null;
 
     const url = URL.createObjectURL(blob);
@@ -56,12 +63,17 @@ export class AudioClipLoader extends AssetLoader<AudioClip> {
     return url;
   }
 
-  private async getAudioBlob() {
+  private async getAudioBlob(isPreview?: boolean) {
     const audio = this.object.getAudio();
 
     try {
-      return new Blob([audio.format === 'fsb' ? await AudioClipLoader.fsbToMp3(audio) : audio.data], {
-        type: audio.format === 'fsb' ? mimeMap.mp3 : (mimeMap[audio.format] ?? `audio/${audio.format}`),
+      return new Blob([audio.format === 'fsb' ? await AudioClipLoader.fsbConverter(audio, isPreview) : audio.data], {
+        type:
+          audio.format === 'fsb'
+            ? isPreview
+              ? mimeMap.wav
+              : getMimeType(AudioClipLoader.convertFormat)
+            : getMimeType(audio.format),
       });
     } catch (error) {
       console.error(error);

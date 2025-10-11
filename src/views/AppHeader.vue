@@ -105,12 +105,14 @@ const menuConfig = markRaw<MenuBarConfig>([
       {
         name: 'Export options',
         divided: true,
+        disabled: () => assetManager.isBatchExporting,
         handler: () => {
           exportOptionsDialogRef.value?.open();
         },
       },
       {
         name: 'UnityCN options',
+        disabled: () => assetManager.isLoading,
         handler: () => {
           unityCNOptionsDialogRef.value?.open();
         },

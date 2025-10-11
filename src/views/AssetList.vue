@@ -337,6 +337,21 @@ const doExport = (type: string) => {
   showNotingCanBeExportToast();
 };
 
+if (import.meta.env.DEV) {
+  const name = import.meta.env.VITE_AUTO_LOAD_AB;
+  if (name) {
+    onMounted(async () => {
+      const r = await fetch(`/ab/${name}`);
+      const data = await r.arrayBuffer();
+      const file = new File([data], name);
+      await store.loadFiles([file]);
+    });
+  }
+  onBeforeUnmount(() => {
+    store.clearFiles();
+  });
+}
+
 defineExpose({
   gotoAsset,
   doExport,
