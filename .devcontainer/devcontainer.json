@@ -1,0 +1,136 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+  "name": "Node.js & TypeScript",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/shyim/devcontainers-features/bun:0": {}
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bun i",
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "MohammadBaqer.better-folding",
+        "pustelto.bracketeer",
+        "oven.bun-vscode",
+        "wmaurer.change-case",
+        "IronGeek.vscode-env",
+        "dbaeumer.vscode-eslint",
+        "antfu.file-nesting",
+        "eamodio.gitlens",
+        "yzhang.markdown-all-in-one",
+        "PKief.material-icon-theme",
+        "bengreenier.vscode-node-readme",
+        "esbenp.prettier-vscode",
+        "meganrogge.template-string-converter",
+        "pflannery.vscode-versionlens",
+        "Vue.volar",
+        "wejectchan.vue3-snippets-for-vscode",
+        "midnightsyntax.vscode-wrap-console-log"
+      ],
+      "settings": {
+        "[css]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[html]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[less]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+        },
+        "[python]": {
+          "editor.formatOnType": true
+        },
+        "[scss]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[vue]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[yaml]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "auto-close-tag.activationOnLanguage": [
+          "xml",
+          "javascriptreact",
+          "typescriptreact",
+          "markdown",
+          "vue",
+          "HTML (EEx)",
+          "HTML (Eex)"
+        ],
+        "css.lint.zeroUnits": "warning",
+        "diffEditor.maxComputationTime": 0,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "editor.formatOnSave": true,
+        "editor.inlineSuggest.enabled": true,
+        "editor.pasteAs.showPasteSelector": "never",
+        "editor.suggestSelection": "first",
+        "editor.tabSize": 2,
+        "editor.unicodeHighlight.nonBasicASCII": false,
+        "editor.wordWrap": "on",
+        "extensions.ignoreRecommendations": false,
+        "fileNestingUpdater.promptOnAutoUpdate": false,
+        "files.associations": {
+          ".env": "env",
+          ".env.*": "env",
+          "*.yml": "yaml"
+        },
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "gitlens.launchpad.indicator.enabled": false,
+        "javascript.preferences.quoteStyle": "single",
+        "javascript.updateImportsOnFileMove.enabled": "always",
+        "javascript.updateImportsOnPaste.enabled": false,
+        "json.schemaDownload.enable": true,
+        "template-string-converter.quoteType": "single",
+        "template-string-converter.validLanguages": [
+          "vue",
+          "svelte",
+          "typescript",
+          "javascript",
+          "typescriptreact",
+          "javascriptreact"
+        ],
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "typescript.updateImportsOnPaste.enabled": false,
+        "versionlens.suggestions.showOnStartup": true,
+        "versionlens.suggestions.showPrereleasesOnStartup": true,
+        "vue.inlayHints.destructuredProps": true,
+        "vue.inlayHints.vBindShorthand": true,
+        "workbench.colorTheme": "Default Dark+",
+        "workbench.iconTheme": "material-icon-theme",
+        "wrap-console-log.format.wrap.prefixString": "$func('$var:', $var);"
+      }
+    }
+  }
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
