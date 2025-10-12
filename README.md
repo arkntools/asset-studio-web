@@ -14,6 +14,8 @@ For the repository feature, please check the [wiki](https://github.com/arkntools
 
 ## Development
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arkntools/asset-studio-web)
+
 To install dependencies:
 
 ```bash
