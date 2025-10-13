@@ -59,9 +59,6 @@
         "[markdown]": {
           "editor.defaultFormatter": "yzhang.markdown-all-in-one"
         },
-        "[python]": {
-          "editor.formatOnType": true
-        },
         "[scss]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
