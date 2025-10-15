@@ -1,6 +1,7 @@
 import { proxy, transfer, wrap } from 'comlink';
 import { defineStore } from 'pinia';
-import { showNotingCanBeExportToast } from '@/utils/toasts';
+import { showBatchFilesResultMessage, showNotingCanBeExportToast } from '@/utils/toasts';
+import type { BatchFilesResult } from '@/utils/toasts';
 import type { AssetInfo, ExportAssetsOnProgress, FileLoadingOnProgress } from '@/workers/assetManager';
 import AssetManagerWorker from '@/workers/assetManager/index.js?worker';
 import { useProgress } from './progress';
@@ -12,16 +13,8 @@ const manager = new AssetManager();
 
 const pickExportDir = () => window.showDirectoryPicker({ id: 'export-assets', mode: 'readwrite' }).catch(console.error);
 
-const showExportResultMessage = (
-  { success, skip, error }: { success: number; skip: number; error: number } = { success: 0, skip: 0, error: 0 },
-) => {
-  const parts: string[] = [`Exported ${success} file${success > 1 ? 's' : ''}`];
-  if (skip) parts.push(`skipped ${skip}`);
-  if (error) parts.push(`failed ${error}`);
-  ElMessage({
-    message: parts.join(', '),
-    type: success ? 'success' : skip ? 'warning' : error ? 'error' : 'info',
-  });
+const showExportResultMessage = (result?: BatchFilesResult) => {
+  showBatchFilesResultMessage('Exported', result);
 };
 
 export const useAssetManager = defineStore('assetManager', () => {

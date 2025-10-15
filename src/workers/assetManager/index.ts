@@ -100,16 +100,16 @@ export class AssetManager {
     let success = 0;
     const { errorStat, errorHandler } = this.createWriteFileErrorHandler();
     const fs = new FsaPromises({ root: handle, cacheDirHandle: true });
-    const pool = new PromisePool<AssetExportItem>(
+    const pool = new PromisePool(
       THREAD_NUM,
-      async ({ name, blob }) => {
+      async ({ name, blob }: AssetExportItem) => {
         await fs.writeFile(name, blob, { flag: 'wx', ensureDir: true });
         success++;
       },
       errorHandler,
     );
     pool.addTasks(new RenameProcessor().process(items));
-    await pool.end();
+    await pool.wait();
 
     return { success, ...errorStat };
   }
@@ -130,9 +130,9 @@ export class AssetManager {
     let success = 0;
     const { errorStat, errorHandler } = this.createWriteFileErrorHandler();
     const fs = new FsaPromises({ root: handle, cacheDirHandle: true });
-    const pool = new PromisePool<AssetExportItem>(
+    const pool = new PromisePool(
       THREAD_NUM,
-      async ({ name, blob }) => {
+      async ({ name, blob }: AssetExportItem) => {
         onProgress({ progress: ++finishedNum / totalNum, name });
         await fs.writeFile(name, blob, { flag: 'wx', ensureDir: true });
         success++;
@@ -156,7 +156,7 @@ export class AssetManager {
       }),
     );
 
-    await pool.end();
+    await pool.wait();
 
     return { success, ...errorStat };
   }

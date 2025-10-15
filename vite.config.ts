@@ -10,6 +10,7 @@ import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
+import VueDevTools from 'vite-plugin-vue-devtools';
 import SvgLoader from 'vite-svg-loader';
 
 const pathSrc = resolve(__dirname, 'src');
@@ -17,6 +18,11 @@ const pathSrc = resolve(__dirname, 'src');
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
   plugins: [
+    VueDevTools({
+      componentInspector: {
+        toggleComboKey: 'alt-s',
+      },
+    }),
     VitePWA({
       registerType: 'prompt',
       workbox: {

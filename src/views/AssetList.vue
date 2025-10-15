@@ -97,6 +97,7 @@
 <script setup lang="ts">
 import IElSearch from '~icons/ep/search';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
+import { IS_MAC } from '@/const';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
@@ -158,11 +159,12 @@ const updateMultiSelectNum = () => {
 };
 
 const handleCellClick: VxeTableEvents.CellClick<AssetInfo> = async ({ row, $event }) => {
-  const { ctrlKey, shiftKey } = $event as MouseEvent;
+  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
+  const modKey = IS_MAC ? metaKey : ctrlKey;
   const $table = tableRef.value!;
   let lastRowIndex: number;
   if (
-    (ctrlKey || shiftKey) &&
+    (modKey || shiftKey) &&
     !isMultiSelect.value &&
     lastAssetInfo &&
     (lastRowIndex = $table.getVTRowIndex(lastAssetInfo)) >= 0
@@ -175,7 +177,7 @@ const handleCellClick: VxeTableEvents.CellClick<AssetInfo> = async ({ row, $even
         visibleData.slice(Math.min(lastRowIndex, rowIndex), Math.max(lastRowIndex, rowIndex) + 1),
         true,
       );
-    } else if (ctrlKey) {
+    } else if (modKey) {
       await $table.setCheckboxRow([lastAssetInfo, row], true);
     }
   }

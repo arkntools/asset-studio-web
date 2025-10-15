@@ -1,57 +1,72 @@
-import '@ungap/with-resolvers';
-import { loopMap } from '@arkntools/unity-js/utils/loop';
+import { Semaphore } from 'es-toolkit';
 
-export class PromisePool<T> {
-  private readonly threads: Promise<void>[];
-  private readonly taskQueue: T[] = [];
-  private waitingResolvers: Array<() => void> = [];
-  private isEnd = false;
+export class AbortError extends Error {
+  constructor() {
+    super('abort');
+  }
+}
+
+export class PromisePool<T, R> {
+  private readonly lock: Semaphore;
+  private readonly promises: Promise<{ task: T; aborted?: boolean; error?: unknown; result?: Awaited<R> }>[] = [];
+  private id = 0;
+  private abortController = new AbortController();
 
   constructor(
     concurrency: number,
-    private readonly handler: (task: T, threadIndex: number) => Promise<void>,
-    private readonly errHandler?: (err: unknown, task: T, threadIndex: number) => void,
+    private readonly handler: (task: T, signal: AbortSignal) => Promise<R>,
+    private readonly errHandler?: (err: unknown, task: T) => void,
+    private readonly abortHandler?: (task: T) => void,
   ) {
-    this.threads = loopMap(concurrency, this.createThread);
+    this.lock = new Semaphore(concurrency);
+  }
+
+  new() {
+    this.id++;
+    if (this.promises.length) {
+      this.abortController.abort(new AbortError());
+      this.abortController = new AbortController();
+    }
+    this.promises.length = 0;
+    return this;
   }
 
   addTasks(tasks: T[]) {
-    if (!tasks.length) return;
-    this.taskQueue.push(...tasks);
-    this.activateThreads();
+    const { id } = this;
+    this.promises.push(
+      ...tasks.map(async task => {
+        await this.lock.acquire();
+        try {
+          if (this.id !== id) return { task, aborted: true };
+          return { task, result: await this.handler(task, this.abortController.signal) };
+        } catch (e) {
+          if (e instanceof AbortError) {
+            try {
+              this.abortHandler?.(task);
+            } catch (error) {
+              console.error(error);
+            }
+            return { task, aborted: true };
+          }
+          try {
+            this.errHandler?.(e, task);
+          } catch (error) {
+            console.error(error);
+          }
+          return { task, error: e };
+        } finally {
+          this.lock.release();
+        }
+      }),
+    );
   }
 
-  end() {
-    this.isEnd = true;
-    this.activateThreads();
-    return Promise.all(this.threads);
+  wait() {
+    return Promise.all(this.promises);
   }
 
-  private activateThreads() {
-    const resolvers = this.waitingResolvers;
-    this.waitingResolvers = [];
-    resolvers.forEach(resolve => resolve());
-  }
-
-  private createThread = async (index: number) => {
-    while (true) {
-      const task = this.taskQueue.shift();
-      if (!task) {
-        if (this.isEnd) break;
-        await this.waitTask();
-        continue;
-      }
-      try {
-        await this.handler(task, index);
-      } catch (err) {
-        this.errHandler?.(err, task, index);
-      }
-    }
-  };
-
-  private async waitTask() {
-    const { resolve, promise } = Promise.withResolvers<void>();
-    this.waitingResolvers.push(resolve);
-    await promise;
+  getIsOutdatedGetter() {
+    const { id } = this;
+    return () => this.id !== id;
   }
 }

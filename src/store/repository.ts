@@ -1,9 +1,10 @@
-import type { RepositoryItem, ResourceItem } from '@arkntools/as-web-repo';
+import type { MaybePromise, RepositoryItem, ResourceItem } from '@arkntools/as-web-repo';
 import { computedAsync, useLocalStorage } from '@vueuse/core';
-import { pull, retry } from 'es-toolkit';
+import { isNotNil, keyBy, pull, retry } from 'es-toolkit';
 import { defineStore } from 'pinia';
 import { useRepoAvailable } from '@/hooks/useRepoAvailable';
 import { IdbKV } from '@/utils/idbKV';
+import { PromisePool } from '@/utils/promisePool';
 
 export interface RepositorySource {
   name: string;
@@ -20,7 +21,7 @@ export const useRepository = defineStore('repository', () => {
 
   const resVerCache = new IdbKV<string>('as-web-repo-res-ver-cache');
   const resListCache = new IdbKV<ResourceItem[]>('as-web-repo-res-list-cache');
-  const resCache = new IdbKV<Blob>('as-web-repo-res-cache');
+  const resCache = new IdbKV<File>('as-web-repo-res-cache');
   const resCacheHash = new IdbKV<string>('as-web-repo-res-cache-hash');
 
   const sourceList = useLocalStorage<RepositorySource[]>('repo-source-list', [], { writeDefaults: false });
@@ -30,7 +31,7 @@ export const useRepository = defineStore('repository', () => {
   const loadingSource = ref('');
   const curSource = useLocalStorage('repo-cur-source', '', { writeDefaults: false });
   const curRepoList = shallowRef<RepositoryItem[]>([]);
-  const curRepoMap = computed(() => Object.fromEntries(curRepoList.value.map(repo => [repo.id, repo])));
+  const curRepoMap = computed(() => keyBy(curRepoList.value, repo => repo.id));
   const curRepoId = useLocalStorage(() => `repo-cur-repo-id-${curSource.value}`, '', {
     writeDefaults: false,
     flush: 'sync',
@@ -136,30 +137,81 @@ export const useRepository = defineStore('repository', () => {
     }
   };
 
-  const getResource = async (item: ResourceItem) => {
-    if (!curSource.value || !curRepo.value || !curResVer) return;
+  const getResource = async (
+    {
+      item,
+      onSuccess,
+    }: {
+      item: ResourceItem;
+      onSuccess?: (file: File) => MaybePromise<void>;
+    },
+    signal?: AbortSignal,
+  ) => {
+    if (!curSource.value || !curRepo.value || !curResVer) throw new Error('Repository not initialized');
     const cacheKey = [curSource.value, curRepo.value.id, item.id].join(',');
     console.log('[Repository] get res:', cacheKey);
     const cacheHash = await resCacheHash.get(cacheKey);
     if (cacheHash === item.hash) {
       console.log('[Repository] hit cache:', cacheHash);
-      const res = await resCache.get(cacheKey);
-      if (res) {
+      const file = await resCache.get(cacheKey);
+      if (file && file instanceof File) {
         resProgressMap.set(item.id, 1);
-        return res;
+        await onSuccess?.(file)?.catch(e => {
+          ElMessage({ message: String(e), type: 'error' });
+        });
+        return file;
       }
     }
     console.log('[Repository] miss cache, start fetch');
     resProgressMap.set(item.id, 0);
-    const res = await curRepo.value.getResource(curResVer, item, {
-      onprogress: ({ loaded, total }) => {
-        resProgressMap.set(item.id, loaded / total);
+    const blob = await curRepo.value.getResource({
+      version: curResVer,
+      item,
+      options: {
+        onprogress: ({ loaded, total }) => {
+          resProgressMap.set(item.id, loaded / total);
+        },
       },
+      signal,
     });
-    Promise.all([resCache.set(cacheKey, res), resCacheHash.set(cacheKey, item.hash)]).then(() => {
+    const file = new File([blob], item.name);
+    Promise.all([resCache.set(cacheKey, file), resCacheHash.set(cacheKey, item.hash)]).then(() => {
       console.log('[Repository] add cache:', cacheKey);
     });
-    return res;
+    onSuccess?.(file);
+    return file;
+  };
+
+  const handleGetResourceError = (error: unknown, { item }: { item: ResourceItem }) => {
+    console.error(error);
+    resProgressMap.delete(item.id);
+    ElMessage({ message: `Get resource "${item.name}" failed: ${error}`, type: 'error' });
+  };
+
+  const handleGetResourceAbort = ({ item }: { item: ResourceItem }) => {
+    console.warn('[Repository] get resource aborted:', item.name);
+    resProgressMap.delete(item.id);
+  };
+
+  const getResourcesPool = new PromisePool(8, getResource, handleGetResourceError, handleGetResourceAbort);
+
+  const getResources = async ({
+    items,
+    onSuccess,
+    useGlobalPool = true,
+  }: {
+    items: ResourceItem[];
+    onSuccess?: (file: File) => void;
+    useGlobalPool?: boolean;
+  }) => {
+    const pool = useGlobalPool
+      ? getResourcesPool.new()
+      : new PromisePool(8, getResource, handleGetResourceError, handleGetResourceAbort);
+    const isOutdated = pool.getIsOutdatedGetter();
+    pool.addTasks(items.map(item => ({ item, onSuccess })));
+    const results = await pool.wait();
+    if (isOutdated()) return null;
+    return results.map(r => r.result).filter(isNotNil);
   };
 
   const checkNewSourceName = (name: string) => !sourceNameSet.value.has(name) && name !== 'Disabled';
@@ -197,6 +249,7 @@ export const useRepository = defineStore('repository', () => {
     resList: curResList,
     resProgressMap: readonly(resProgressMap),
     getResource,
+    getResources,
     checkNewSourceName,
     checkNewSourceUrl,
     addSource,

@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.4.1",
-    "@arkntools/as-web-repo": "^1.0.7",
+    "@arkntools/as-web-repo": "^1.1.0",
     "@tsconfig/node20": "^20.1.6",
     "@tsuk1ko/eslint-config": "^1.1.0",
     "@types/file-saver": "^2.0.7",
@@ -65,6 +65,7 @@
     "vite": "^7.1.9",
     "vite-plugin-node-polyfills": "^0.24.0",
     "vite-plugin-pwa": "^1.0.3",
+    "vite-plugin-vue-devtools": "^8.0.2",
     "vite-svg-loader": "^5.1.0",
     "vue-tsc": "^3.1.1"
   }

@@ -28,11 +28,11 @@
         :row-config="{
           useKey: true,
           keyField: 'id',
-          isCurrent: true,
           isHover: true,
         }"
         :column-config="{ resizable: true }"
         :keyboard-config="{ isArrow: true }"
+        :checkbox-config="{ trigger: 'row', highlight: true, isShiftKey: true }"
         :custom-config="{ storage: { visible: true, resizable: true } }"
         :menu-config="menuConfig"
         :scroll-y="{ enabled: true }"
@@ -40,6 +40,7 @@
         show-header-overflow
         @header-cell-click="handleHeaderCellClick"
         @menu-click="handleMenu"
+        @cell-click="handleCellClick"
         @cell-menu="handleCellMenu"
         @cell-dblclick="handleCellDblclick"
       >
@@ -71,16 +72,20 @@
 
 <script setup lang="ts">
 import type { ResourceItem } from '@arkntools/as-web-repo';
+import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import IElSearch from '~icons/ep/search';
 import { saveAs } from 'file-saver';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import ResourceFetchProgress from '@/components/ResourceFetchProgress.vue';
+import { IS_MAC } from '@/const';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useRepository } from '@/store/repository';
 import { getLegalFileName } from '@/utils/file';
 import { formatSize } from '@/utils/formater';
+import { showBatchFilesResultMessage } from '@/utils/toasts';
+import type { BatchFilesResult } from '@/utils/toasts';
 import { getMenuHeaderConfig, getVxeTableCommonTools, handleCommonMenu } from '@/utils/vxeTableCommon';
 
 const tableRef = useTemplateRef<VxeTableInstance>('tableRef');
@@ -124,46 +129,94 @@ const menuConfig: VxeTablePropTypes.MenuConfig<ResourceItem> = reactive({
 });
 
 const handleMenu: VxeTableEvents.MenuClick<ResourceItem> = async params => {
-  const { menu, row } = params;
+  const { $table, menu, column } = params;
+  const rows = await $table.getCheckboxRecords();
   switch (menu.code) {
     case 'download':
-      downloadRes(row);
+      downloadRes(rows);
       break;
     case 'loadRes':
-      loadRes(row);
+      loadRes(rows);
       break;
+    case 'copy':
+      if (rows.length > 1) {
+        await navigator.clipboard.writeText(rows.map(row => String((row as any)[column.field])).join('\n'));
+        break;
+      }
+    // eslint-disable-next-line no-fallthrough
     default:
       handleCommonMenu(params);
       break;
   }
 };
 
-const handleCellMenu: VxeTableEvents.CellMenu<ResourceItem> = ({ row }) => {
-  if (!tableRef.value) return;
-  tableRef.value.setCurrentRow(row);
+const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table }) => {
+  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
+  const modKey = IS_MAC ? metaKey : ctrlKey;
+  if (modKey || shiftKey) return;
+  await $table.clearCheckboxRow();
+  await $table.setCheckboxRow(row, true);
 };
 
-const handleCellDblclick: VxeTableEvents.CellDblclick<ResourceItem> = ({ row }) => {
-  loadRes(row);
+const handleCellMenu: VxeTableEvents.CellMenu<ResourceItem> = async ({ row, $event, $table }) => {
+  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
+  const modKey = IS_MAC ? metaKey : ctrlKey;
+  if (modKey || shiftKey || $table.isCheckedByCheckboxRow(row)) return;
+  await $table.clearCheckboxRow();
+  await $table.setCheckboxRow(row, true);
 };
 
-const downloadRes = async (row: ResourceItem) => {
-  const res = await repoManager.getResource(row);
-  if (!res) return;
-  saveAs(res, getLegalFileName(row.name));
+const handleCellDblclick: VxeTableEvents.CellDblclick<ResourceItem> = async ({ row, $table }) => {
+  loadRes([row]);
+  await $table.clearCheckboxRow();
+  await $table.setCheckboxRow(row, true);
 };
 
-let curLoadingResId: any;
+const pickDownloadDir = () =>
+  window.showDirectoryPicker({ id: 'download-resources', mode: 'readwrite' }).catch(console.error);
 
-const loadRes = async (row: ResourceItem) => {
-  curLoadingResId = row.id;
-  const res = await repoManager.getResource(row);
-  if (!res || curLoadingResId !== row.id) return;
-  try {
-    await assetManager.loadFiles([new File([res], row.name)]);
-  } finally {
-    curLoadingResId = undefined;
+const downloadRes = async (rows: ResourceItem[]) => {
+  if (!rows.length) return;
+
+  if (rows.length === 1) {
+    const row = rows[0];
+    const res = await repoManager.getResource({ item: row });
+    if (!res) return;
+    saveAs(res, getLegalFileName(row.name));
+    return;
   }
+
+  const handle = await pickDownloadDir();
+  if (!handle) return;
+  const fs = new FsaPromises({ root: handle, cacheDirHandle: true });
+  const result: Required<BatchFilesResult> = {
+    success: 0,
+    skip: 0,
+    error: 0,
+  };
+  await repoManager.getResources({
+    items: rows,
+    onSuccess: async file => {
+      try {
+        await fs.writeFile(getLegalFileName(file.name), file, { flag: 'wx' });
+        result.success++;
+      } catch (e) {
+        if (e instanceof FsaError && e.code === FsaErrorCode.EEXIST) {
+          result.skip++;
+          return;
+        }
+        result.error++;
+        throw e;
+      }
+    },
+  });
+  showBatchFilesResultMessage('Downloaded', result);
+};
+
+const loadRes = async (rows: ResourceItem[]) => {
+  const files = await repoManager.getResources({ items: rows });
+  if (!files?.length) return;
+  await assetManager.loadFiles(files);
 };
 
 const repoListOptions = computed(() =>
@@ -213,6 +266,11 @@ const repoListOptions = computed(() =>
       }
     }
   }
+}
+
+.resource-list-table {
+  --vxe-table-row-checkbox-checked-background-color: var(--vxe-table-row-current-background-color);
+  --vxe-table-row-hover-checkbox-checked-background-color: var(--vxe-table-row-hover-current-background-color);
 }
 
 .resource-list-table__cell-name {
