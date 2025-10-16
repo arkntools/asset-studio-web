@@ -77,11 +77,11 @@ import IElSearch from '~icons/ep/search';
 import { saveAs } from 'file-saver';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import ResourceFetchProgress from '@/components/ResourceFetchProgress.vue';
-import { IS_MAC } from '@/const';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useRepository } from '@/store/repository';
+import { getKeysFromMouseEvent } from '@/utils/common';
 import { getLegalFileName } from '@/utils/file';
 import { formatSize } from '@/utils/formater';
 import { showBatchFilesResultMessage } from '@/utils/toasts';
@@ -151,16 +151,14 @@ const handleMenu: VxeTableEvents.MenuClick<ResourceItem> = async params => {
 };
 
 const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table }) => {
-  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
-  const modKey = IS_MAC ? metaKey : ctrlKey;
+  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
   if (modKey || shiftKey) return;
   await $table.clearCheckboxRow();
   await $table.setCheckboxRow(row, true);
 };
 
 const handleCellMenu: VxeTableEvents.CellMenu<ResourceItem> = async ({ row, $event, $table }) => {
-  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
-  const modKey = IS_MAC ? metaKey : ctrlKey;
+  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
   if (modKey || shiftKey || $table.isCheckedByCheckboxRow(row)) return;
   await $table.clearCheckboxRow();
   await $table.setCheckboxRow(row, true);

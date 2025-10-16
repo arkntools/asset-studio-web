@@ -97,12 +97,11 @@
 <script setup lang="ts">
 import IElSearch from '~icons/ep/search';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
-import { IS_MAC } from '@/const';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
-import { sleep } from '@/utils/common';
+import { getKeysFromMouseEvent, sleep } from '@/utils/common';
 import { getFilesFromDataTransferItems } from '@/utils/file';
 import { formatSize } from '@/utils/formater';
 import { showNotingCanBeExportToast } from '@/utils/toasts';
@@ -159,8 +158,7 @@ const updateMultiSelectNum = () => {
 };
 
 const handleCellClick: VxeTableEvents.CellClick<AssetInfo> = async ({ row, $event }) => {
-  const { ctrlKey, shiftKey, metaKey } = $event as MouseEvent;
-  const modKey = IS_MAC ? metaKey : ctrlKey;
+  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
   const $table = tableRef.value!;
   let lastRowIndex: number;
   if (
