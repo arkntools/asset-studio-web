@@ -1,7 +1,7 @@
 <template>
   <div class="resource-list">
     <div class="resource-list-header">
-      <el-input v-model="searchInput" class="search-input" placeholder="Search" :prefix-icon="IElSearch" clearable />
+      <SearchInput ref="searchInputRef" />
       <el-select
         v-model="repoManager.repoId"
         :class="{ 'repo-select-loading': !repoListOptions.length }"
@@ -73,13 +73,12 @@
 <script setup lang="ts">
 import type { ResourceItem } from '@arkntools/as-web-repo';
 import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
-import IElSearch from '~icons/ep/search';
 import { saveAs } from 'file-saver';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import ResourceFetchProgress from '@/components/ResourceFetchProgress.vue';
+import SearchInput from '@/components/SearchInput.vue';
 import { useLastValue } from '@/hooks/useLastValue';
 import { useNatsort } from '@/hooks/useNatsort';
-import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useRepository } from '@/store/repository';
 import { getKeysFromMouseEvent } from '@/utils/common';
@@ -89,23 +88,17 @@ import { showBatchFilesResultMessage } from '@/utils/toasts';
 import type { BatchFilesResult } from '@/utils/toasts';
 import { getMenuHeaderConfig, getVxeTableCommonTools, handleCommonMenu } from '@/utils/vxeTableCommon';
 
-const tableRef = useTemplateRef<VxeTableInstance>('tableRef');
+const tableRef = ref<VxeTableInstance<ResourceItem>>();
 const { handleHeaderCellClick, menuConfigVisibleMethodProcessHeader } = getVxeTableCommonTools(tableRef);
 
 const assetManager = useAssetManager();
 const repoManager = useRepository();
 
-const { source: searchInput, result: searchInputDebounced } = useRefDebouncedConditional({
-  initValue: '',
-  delay: 200,
-  condition: v => !!v,
-});
+const searchInputRef = useTemplateRef('searchInputRef');
 
-const searchedResList = computed(() => {
-  const searchText = searchInputDebounced.value.toLowerCase();
-  if (!searchText) return repoManager.resList;
-  return repoManager.resList.filter(({ name }) => name.toLowerCase().includes(searchText));
-});
+const searchedResList = computed(
+  () => searchInputRef.value?.doSearch(repoManager.resList, ({ name }) => name) || repoManager.resList,
+);
 
 const getResNameSortIndex = useNatsort(() => repoManager.resList.map(({ name }) => name));
 const sortNameMethod: VxeColumnPropTypes.SortBy<ResourceItem> = ({ row }) => getResNameSortIndex(row.name);
@@ -269,12 +262,12 @@ const repoListOptions = computed(() =>
   }
 
   &-header {
-    --el-border-radius-base: 0;
     flex-shrink: 0;
     margin-bottom: -1px;
     z-index: 10;
 
     :deep(.el-input__wrapper) {
+      z-index: 1;
       &:hover {
         z-index: 10;
       }
@@ -284,6 +277,7 @@ const repoListOptions = computed(() =>
     }
 
     :deep(.el-select__wrapper) {
+      --el-border-radius-base: 0;
       &:hover {
         z-index: 10;
       }

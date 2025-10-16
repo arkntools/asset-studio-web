@@ -1,7 +1,7 @@
 <template>
   <div class="asset-list-table-wrapper">
     <div class="asset-list-table-header">
-      <el-input v-model="searchInput" placeholder="Search" :prefix-icon="IElSearch" clearable />
+      <SearchInput ref="searchInputRef" />
     </div>
     <div class="asset-list-table-main" @dragover.capture.prevent @drop.capture.prevent="handleDropFiles">
       <vxe-table
@@ -95,10 +95,9 @@
 </template>
 
 <script setup lang="ts">
-import IElSearch from '~icons/ep/search';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
+import SearchInput from '@/components/SearchInput.vue';
 import { useNatsort } from '@/hooks/useNatsort';
-import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
 import { getKeysFromMouseEvent, sleep } from '@/utils/common';
@@ -132,16 +131,11 @@ const filteredAssetInfos = computed(() =>
   setting.data.hideNamelessAssets ? store.assetInfos.filter(({ name }) => name) : store.assetInfos,
 );
 
-const { source: searchInput, result: searchInputDebounced } = useRefDebouncedConditional({
-  initValue: '',
-  delay: 200,
-  condition: v => !!v,
-});
-const searchedAssetInfos = computed(() => {
-  const searchText = searchInputDebounced.value.toLowerCase();
-  if (!searchText) return filteredAssetInfos.value;
-  return filteredAssetInfos.value.filter(({ search }) => search.includes(searchText));
-});
+const searchInputRef = useTemplateRef('searchInputRef');
+
+const searchedAssetInfos = computed(
+  () => searchInputRef.value?.doSearch(filteredAssetInfos.value, ({ search }) => search) || filteredAssetInfos.value,
+);
 
 const getAssetNameSortIndex = useNatsort(() => store.assetInfos.map(({ name }) => name));
 const sortNameMethod: VxeColumnPropTypes.SortBy<AssetInfo> = ({ row }) => getAssetNameSortIndex(row.name);
@@ -291,8 +285,8 @@ const gotoAsset = async (pathId: bigint) => {
   }
 
   if ($table.isActiveFilterByColumn(null)) await $table.clearFilter();
-  if (searchInput.value) {
-    searchInput.value = '';
+  if (searchInputRef.value?.search) {
+    searchInputRef.value.clear();
     await sleep();
     await sleep();
   }
@@ -393,7 +387,6 @@ defineExpose({
   }
 
   &-header {
-    --el-border-radius-base: 0;
     flex-shrink: 0;
     margin-bottom: -1px;
     z-index: 10;
