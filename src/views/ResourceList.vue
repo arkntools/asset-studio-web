@@ -32,7 +32,7 @@
         }"
         :column-config="{ resizable: true }"
         :keyboard-config="{ isArrow: true }"
-        :checkbox-config="{ trigger: 'row', highlight: true, isShiftKey: true }"
+        :checkbox-config="{ trigger: 'row', highlight: true }"
         :custom-config="{ storage: { visible: true, resizable: true } }"
         :menu-config="menuConfig"
         :scroll-y="{ enabled: true }"
@@ -77,6 +77,7 @@ import IElSearch from '~icons/ep/search';
 import { saveAs } from 'file-saver';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import ResourceFetchProgress from '@/components/ResourceFetchProgress.vue';
+import { useLastValue } from '@/hooks/useLastValue';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
@@ -150,9 +151,36 @@ const handleMenu: VxeTableEvents.MenuClick<ResourceItem> = async params => {
   }
 };
 
-const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table }) => {
+const curActiveRow = shallowRef<ResourceItem>();
+const lastActiveRow = useLastValue(curActiveRow);
+
+watch(
+  () => repoManager.resList,
+  () => {
+    curActiveRow.value = undefined;
+    lastActiveRow.value = undefined;
+    tableRef.value?.clearCheckboxRow();
+  },
+);
+
+const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table, $rowIndex }) => {
+  curActiveRow.value = row;
   const { modKey, shiftKey } = getKeysFromMouseEvent($event);
-  if (modKey || shiftKey) return;
+  if (modKey) return;
+
+  if (shiftKey) {
+    let lastRowIndex: number;
+    if (lastActiveRow.value && (lastRowIndex = $table.getVTRowIndex(lastActiveRow.value)) >= 0) {
+      const { visibleData } = $table.getTableData();
+      await $table.clearCheckboxRow();
+      await $table.setCheckboxRow(
+        visibleData.slice(Math.min(lastRowIndex, $rowIndex), Math.max(lastRowIndex, $rowIndex) + 1),
+        true,
+      );
+      return;
+    }
+  }
+
   await $table.clearCheckboxRow();
   await $table.setCheckboxRow(row, true);
 };
