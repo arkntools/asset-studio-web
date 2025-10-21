@@ -97,7 +97,7 @@ const repoManager = useRepository();
 const searchInputRef = useTemplateRef('searchInputRef');
 
 const searchedResList = computed(
-  () => searchInputRef.value?.doSearch(repoManager.resList, ({ name }) => name) || repoManager.resList,
+  () => searchInputRef.value?.doSearch(repoManager.resList, ({ name }) => [name]) || repoManager.resList,
 );
 
 const getResNameSortIndex = useNatsort(() => repoManager.resList.map(({ name }) => name));

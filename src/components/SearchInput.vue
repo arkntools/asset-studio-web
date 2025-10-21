@@ -35,15 +35,19 @@ const isCaseSensitive = ref(false);
 const inputValue = ref('');
 
 const search = ref<string | RegExp>('');
-const searchDebounced = useRefDebouncedConditional({
-  source: search,
+const inputValueDebounced = useRefDebouncedConditional({
+  source: inputValue,
   delay: 200,
   condition: Boolean,
 });
 
-watch([inputValue, isRegex, isCaseSensitive], ([val, reg, cs]) => {
+watchEffect(() => {
+  const val = inputValueDebounced.value;
+  const reg = isRegex.value;
+  const cs = isCaseSensitive.value;
+
   if (!reg || !val) {
-    search.value = val;
+    search.value = cs ? val : val.toLowerCase();
     isError.value = false;
     return;
   }
@@ -60,18 +64,14 @@ const clear = () => {
   inputValue.value = '';
 };
 
-const doSearch = <T,>(list: T[], valueGetter: (item: T) => string) => {
-  const searchRaw = searchDebounced.value;
+const doSearch = <T,>(list: T[], valueGetter: (item: T) => string[]) => {
+  const searchRaw = search.value;
   if (!searchRaw) return list;
   if (searchRaw instanceof RegExp) {
-    return list.filter(item => searchRaw.test(valueGetter(item)));
+    return list.filter(item => valueGetter(item).some(value => searchRaw.test(value)));
   }
   const searchText = isCaseSensitive.value ? searchRaw : searchRaw.toLowerCase();
-  return list.filter(item => {
-    let value = valueGetter(item);
-    if (isCaseSensitive.value) value = value.toLowerCase();
-    return value.includes(searchText);
-  });
+  return list.filter(item => valueGetter(item).some(value => value.includes(searchText)));
 };
 
 defineExpose({

@@ -21,7 +21,6 @@ export interface AssetInfo {
   pathId: bigint;
   size: number;
   preview: PreviewInfo;
-  search: string;
   canExport: boolean;
 }
 
@@ -188,7 +187,6 @@ export class AssetManager {
             pathId,
             size,
             preview: loader.getPreviewInfo(),
-            search: name.toLowerCase(),
             canExport: loader.canExport(),
           };
         }),
