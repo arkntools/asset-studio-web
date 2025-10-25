@@ -63,6 +63,7 @@ export const useAssetManager = defineStore('assetManager', () => {
   const loadFiles = async (files: File[]) => {
     if (isLoading.value) return;
     isLoading.value = true;
+    curAssetInfo.value = undefined;
     try {
       const { errors, infos, successNum } = await (
         await manager
@@ -74,20 +75,23 @@ export const useAssetManager = defineStore('assetManager', () => {
         },
         onProgress,
       );
-      if (infos.length) {
-        assetInfos.value = infos;
-        curAssetInfo.value = undefined;
+      assetInfos.value = infos;
+      if (!infos.length) {
         ElMessage({
-          message: `Loaded ${infos.length} assets from ${successNum} files`,
-          type: 'success',
+          message: `No assets loaded from ${files.length} files`,
+          type: 'warning',
         });
-      }
-      if (files.length === 1 && errors.length) {
+      } else if (files.length === 1 && errors.length) {
         errors.forEach(({ name, error }) => {
           ElMessage({
             message: `Failed to load ${name}: ${error}`,
             type: 'error',
           });
+        });
+      } else {
+        ElMessage({
+          message: `Loaded ${infos.length} assets from ${successNum} files`,
+          type: 'success',
         });
       }
     } catch (error) {

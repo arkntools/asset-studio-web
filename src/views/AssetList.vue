@@ -88,16 +88,18 @@
         <el-button type="primary" size="small" @click="handleCancelMultiSelect">Cancel</el-button>
       </div>
     </div>
-    <div v-if="store.isLoading || store.isBatchExporting" class="asset-list-table-footer">
+    <div v-if="showProgressBar" class="asset-list-table-footer">
       <ProgressBar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { identity } from 'es-toolkit';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import SearchInput from '@/components/SearchInput.vue';
 import { useNatsort } from '@/hooks/useNatsort';
+import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
 import { getKeysFromMouseEvent, sleep } from '@/utils/common';
@@ -130,6 +132,12 @@ const handleDropFiles = async (e: DragEvent) => {
 const filteredAssetInfos = computed(() =>
   setting.data.hideNamelessAssets ? store.assetInfos.filter(({ name }) => name) : store.assetInfos,
 );
+
+const showProgressBar = useRefDebouncedConditional({
+  source: computed(() => store.isLoading || store.isBatchExporting),
+  delay: 300,
+  condition: identity,
+});
 
 const searchInputRef = useTemplateRef('searchInputRef');
 
@@ -204,21 +212,24 @@ const menuConfig: VxeTablePropTypes.MenuConfig<AssetInfo> = reactive({
   body: {
     options: [
       [
-        { code: 'copy', name: 'Copy text', prefixIcon: 'vxe-icon-copy' },
         { code: 'export', name: 'Export select asset', prefixIcon: 'vxe-icon-save', disabled: false },
+        { code: 'copy', name: 'Copy text', prefixIcon: 'vxe-icon-copy' },
       ],
-      [{ code: 'multiselect', name: 'Multi select', prefixIcon: 'vxe-icon-square-checked' }],
+      [
+        { code: 'multiselect', name: 'Multi select', prefixIcon: 'vxe-icon-square-checked' },
+        { code: 'selectAll', name: 'Select all', prefixIcon: 'vxe-icon-square-checked' },
+      ],
     ],
   },
   visibleMethod: params => {
     const { type, options, column, row } = params;
-    if (type !== 'header') {
-      if (isMultiSelect.value || !row) return false;
-      options[0][1].disabled = !store.canExport(row);
+    if (type === 'header') {
+      if (column?.type === 'checkbox') return false;
+      menuConfigVisibleMethodProcessHeader(params);
       return true;
     }
-    if (column?.type === 'checkbox') return false;
-    menuConfigVisibleMethodProcessHeader(params);
+    if (isMultiSelect.value || !row) return false;
+    options[0][0].disabled = !store.canExport(row);
     return true;
   },
 });
@@ -232,6 +243,11 @@ const handleMenu: VxeTableEvents.MenuClick<AssetInfo> = async params => {
     case 'multiselect':
       isMultiSelect.value = true;
       await $table.setCheckboxRow(row, true);
+      updateMultiSelectNum();
+      break;
+    case 'selectAll':
+      isMultiSelect.value = true;
+      await $table.setAllCheckboxRow(true);
       updateMultiSelectNum();
       break;
     default:

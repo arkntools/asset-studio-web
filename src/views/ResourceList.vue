@@ -108,15 +108,17 @@ const menuConfig: VxeTablePropTypes.MenuConfig<ResourceItem> = reactive({
   body: {
     options: [
       [
-        { code: 'copy', name: 'Copy text', prefixIcon: 'vxe-icon-copy' },
         { code: 'loadRes', name: 'Load resource', prefixIcon: 'vxe-icon-file-zip' },
         { code: 'download', name: 'Download', prefixIcon: 'vxe-icon-download' },
+        { code: 'copy', name: 'Copy text', prefixIcon: 'vxe-icon-copy' },
       ],
+      [{ code: 'selectAll', name: 'Select all', prefixIcon: 'vxe-icon-square-checked' }],
     ],
   },
   visibleMethod: params => {
     if (params.type === 'header') {
       menuConfigVisibleMethodProcessHeader(params);
+      return true;
     }
     return true;
   },
@@ -131,6 +133,9 @@ const handleMenu: VxeTableEvents.MenuClick<ResourceItem> = async params => {
       break;
     case 'loadRes':
       loadRes(rows);
+      break;
+    case 'selectAll':
+      await $table.setAllCheckboxRow(true);
       break;
     case 'copy':
       if (rows.length > 1) {
