@@ -1,10 +1,12 @@
 import { proxy, transfer, wrap } from 'comlink';
 import { defineStore } from 'pinia';
+import type { RepoDataHandler } from '@/types/repository';
 import { showBatchFilesResultMessage, showNotingCanBeExportToast } from '@/utils/toasts';
 import type { BatchFilesResult } from '@/utils/toasts';
 import type { AssetInfo, ExportAssetsOnProgress, FileLoadingOnProgress } from '@/workers/assetManager';
 import AssetManagerWorker from '@/workers/assetManager/index.js?worker';
 import { useProgress } from './progress';
+import { useRepository } from './repository';
 import { useSetting } from './setting';
 
 const { AssetManager } = wrap<typeof import('@/workers/assetManager')>(new AssetManagerWorker());
@@ -20,6 +22,7 @@ const showExportResultMessage = (result?: BatchFilesResult) => {
 export const useAssetManager = defineStore('assetManager', () => {
   const progressStore = useProgress();
   const setting = useSetting();
+  const repository = useRepository();
 
   const assetInfos = shallowRef<AssetInfo[]>([]);
   const curAssetInfo = shallowRef<AssetInfo>();
@@ -103,21 +106,34 @@ export const useAssetManager = defineStore('assetManager', () => {
     await (await manager).clear();
   };
 
-  const loadPreviewData = async ({ fileId, pathId }: Pick<AssetInfo, 'fileId' | 'pathId'>, payload?: any) =>
-    (await manager).getPreviewData(fileId, pathId, payload);
+  const getDataHandler = async (info: AssetInfo) => {
+    const { dataHandler } = repository;
+    try {
+      if (dataHandler && (await dataHandler.needHandle(info))) {
+        return proxy<RepoDataHandler>(data => dataHandler.handler(info, data));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const loadPreviewData = async (info: AssetInfo, payload?: any) => {
+    return (await manager).getPreviewData(info.fileId, info.pathId, payload, await getDataHandler(info));
+  };
 
   const setCurAssetInfo = (info: AssetInfo) => {
     curAssetInfo.value = info;
   };
 
-  const exportAsset = async ({ fileId, pathId, canExport }: AssetInfo) => {
+  const exportAsset = async (info: AssetInfo) => {
+    const { fileId, pathId, canExport } = info;
     if (!canExport) {
       showNotingCanBeExportToast();
       return;
     }
     const handle = await pickExportDir();
     if (!handle) return;
-    showExportResultMessage(await (await manager).exportAsset(handle, fileId, pathId));
+    showExportResultMessage(await (await manager).exportAsset(handle, fileId, pathId, await getDataHandler(info)));
   };
 
   const isBatchExporting = ref(false);
@@ -139,14 +155,21 @@ export const useAssetManager = defineStore('assetManager', () => {
         type: 'exporting',
         desc: 'Exporting',
       });
+      const dataHandlers = await Promise.all(infos.map(info => getDataHandler(info)));
       showExportResultMessage(
         await (
           await manager
         ).exportAssets(
           handle,
-          infos.map(({ fileId, pathId, fileName }) => ({ fileId, pathId, fileName })),
+          infos.map(({ fileId, pathId, fileName }, i) => ({
+            fileId,
+            pathId,
+            fileName,
+            hasDataHandler: Boolean(dataHandlers[i]),
+          })),
           { groupMethod: setting.data.exportGroupMethod },
           batchExportOnProgress,
+          proxy((data, i) => dataHandlers[i]!(data)),
         ),
       );
       progressStore.setProgress({

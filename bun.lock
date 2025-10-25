@@ -31,7 +31,7 @@
       },
       "devDependencies": {
         "@antfu/eslint-config": "^5.4.1",
-        "@arkntools/as-web-repo": "^1.1.0",
+        "@arkntools/as-web-repo": "file:.yalc/@arkntools/as-web-repo",
         "@tsconfig/node20": "^20.1.6",
         "@tsuk1ko/eslint-config": "^1.1.0",
         "@types/file-saver": "^2.0.7",
@@ -71,7 +71,7 @@
 
     "@apideck/better-ajv-errors": ["@apideck/better-ajv-errors@0.3.6", "", { "dependencies": { "json-schema": "^0.4.0", "jsonpointer": "^5.0.0", "leven": "^3.1.0" }, "peerDependencies": { "ajv": ">=8" } }, "sha512-P+ZygBLZtkp0qqOAJJVX4oX/sFo5JR3eBWwwuqHHhK0GIgQOKWrAfiAaWX0aArHkRWHMuggFEgAZNxVPwPZYaA=="],
 
-    "@arkntools/as-web-repo": ["@arkntools/as-web-repo@1.1.0", "", { "dependencies": { "@arkntools/userscript-extension": "^1.0.4" } }, "sha512-pzvhbIqkN6CssMoC0hXR09Nbh1kS88XhN+vL1nFEhIIosvKKt8pXHwzN+3Q9QNt6ExwCAhaXM2BcwmgXYN98tw=="],
+    "@arkntools/as-web-repo": ["@arkntools/as-web-repo@file:.yalc/@arkntools/as-web-repo", { "dependencies": { "@arkntools/userscript-extension": "^1.0.4" } }],
 
     "@arkntools/fmod": ["@arkntools/fmod@1.0.4", "", {}, "sha512-Xs084PhEePqbWneBAxGHrgIJ6DZujUjmMpFX9+S6F25MxZQ+DrdkM3NNPowk3pESxli6kUohbnHD3fSRdk1nvw=="],
 

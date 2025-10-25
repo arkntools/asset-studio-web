@@ -5,6 +5,7 @@ import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import { expose } from 'comlink';
 import { md5 as calcMd5 } from 'js-md5';
 import { ExportGroupMethod } from '@/types/export';
+import type { RepoBatchDataHandler, RepoDataHandler } from '@/types/repository';
 import { PromisePool } from '@/utils/promisePool';
 import { clearCache, createLoader } from './loaders';
 import type { AssetExportItem, PreviewInfo } from './loaders';
@@ -82,18 +83,18 @@ export class AssetManager {
     return { errors, infos, successNum };
   }
 
-  async getPreviewData(fileId: string, pathId: bigint, payload?: any) {
+  async getPreviewData(fileId: string, pathId: bigint, payload?: any, dataHandler?: RepoDataHandler) {
     const obj = this.getAssetObj(fileId, pathId);
     if (!obj) return null;
-    return await createLoader(obj).getPreviewData(payload);
+    return await createLoader(obj).getPreviewData(payload, dataHandler);
   }
 
-  async exportAsset(handle: FileSystemDirectoryHandle, fileId: string, pathId: bigint) {
+  async exportAsset(handle: FileSystemDirectoryHandle, fileId: string, pathId: bigint, dataHandler?: RepoDataHandler) {
     const obj = this.getAssetObj(fileId, pathId);
     if (!obj) return;
     const loader = createLoader(obj);
     if (!loader.canExport()) return;
-    const items = await loader.export();
+    const items = await loader.export(dataHandler);
     if (!items?.length) return;
 
     let success = 0;
@@ -115,9 +116,10 @@ export class AssetManager {
 
   async exportAssets(
     handle: FileSystemDirectoryHandle,
-    params: Array<{ fileId: string; pathId: bigint; fileName: string }>,
+    params: Array<{ fileId: string; pathId: bigint; fileName: string; hasDataHandler: boolean }>,
     { groupMethod }: { groupMethod: ExportGroupMethod },
     onProgress: ExportAssetsOnProgress,
+    dataHandler: RepoBatchDataHandler,
   ) {
     let totalNum = params.length;
     let finishedNum = 0;
@@ -143,12 +145,12 @@ export class AssetManager {
     const objPathGetter = this.createObjPathGetter(groupMethod);
 
     await Promise.all(
-      params.map(async ({ fileId, pathId, fileName }) => {
+      params.map(async ({ fileId, pathId, fileName, hasDataHandler }, i) => {
         const obj = this.getAssetObj(fileId, pathId);
         if (!obj) return minusTotalNum();
         const loader = createLoader(obj);
         if (!loader.canExport()) return minusTotalNum();
-        const items = await loader.export();
+        const items = await loader.export(hasDataHandler ? data => dataHandler(data, i) : undefined);
         if (!items?.length) return minusTotalNum();
         if (items.length > 1) totalNum += items.length - 1;
         pool.addTasks(renameProcessor.process(items, objPathGetter(obj, fileName)));

@@ -1,5 +1,6 @@
 # Dev
-/public/ab/*
+/public/ab
+/public/dev
 
 # Yalc
 .yalc

@@ -10,6 +10,7 @@
           :asset="assetManager.curAssetInfo!"
           :data="previewData"
           :desc="enablePreview ? undefined : 'Preview disabled'"
+          :loading="previewDataLoadingDebounced"
           @goto-asset="(pathId: any) => emits('gotoAsset', pathId)"
           @update-payload="(payload: any) => (previewPayload = payload)"
         />
@@ -20,6 +21,7 @@
 
 <script setup lang="ts">
 import { computedAsync } from '@vueuse/core';
+import { identity } from 'es-toolkit';
 import AssetAudioViewer from '@/components/AssetAudioViewer.vue';
 import AssetImageViewer from '@/components/AssetImageViewer.vue';
 import AssetDumpViewer from '@/components/AssetInspectViewer.vue';
@@ -27,6 +29,7 @@ import AssetNoPreview from '@/components/AssetNoPreview.vue';
 import AssetSpineViewer from '@/components/AssetSpineViewer.vue';
 import AssetTextViewer from '@/components/AssetTextViewer.vue';
 import AssetTypeTreeViewer from '@/components/AssetTypeTreeViewer.vue';
+import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
 import { PreviewType } from '@/types/preview';
@@ -49,6 +52,11 @@ const activePane = ref(enablePreview.value ? PreviewTab.Preview : PreviewTab.Typ
 
 const previewPayload = shallowRef<any>();
 const previewDataLoading = ref(false);
+const previewDataLoadingDebounced = useRefDebouncedConditional({
+  source: previewDataLoading,
+  delay: 300,
+  condition: identity,
+});
 
 watch(
   () => assetManager.curAssetInfo,
@@ -73,13 +81,11 @@ const previewDataAsync = computedAsync(
     const info = assetManager.curAssetInfo;
     if (!info) return null;
     const {
-      fileId,
-      pathId,
       preview: { type },
     } = info;
     if (type === PreviewType.None || (type === PreviewType.ImageList && !previewPayload.value)) return null;
     const data = await assetManager.loadPreviewData(
-      { fileId, pathId },
+      info,
       type === PreviewType.ImageList ? previewPayload.value : undefined,
     );
     return data ?? null;

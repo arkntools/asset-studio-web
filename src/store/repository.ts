@@ -12,6 +12,9 @@ export interface RepositorySource {
 }
 
 const loadRepo = async (source: string): Promise<RepositoryItem[]> => {
+  if (import.meta.env.VITE_REPO_DEV_URL) {
+    return (await import(/* @vite-ignore */ new URL(import.meta.env.VITE_REPO_DEV_URL, location.href).href)).default;
+  }
   const url = source.match(/^https?:\/\//) ? source : `https://unpkg.com/${source}`;
   return (await import(/* @vite-ignore */ url)).default;
 };
@@ -39,6 +42,14 @@ export const useRepository = defineStore('repository', () => {
   const curRepo = computed<RepositoryItem | undefined>(() => curRepoMap.value[curRepoId.value]);
   const resListLoading = ref(false);
   const resProgressMap = reactive(new Map<string | number, number>());
+  const dataHandler = computed(() => {
+    const repo = curRepo.value;
+    if (!repo?.hasDataHandler || !repo.dataHandler) return undefined;
+    return {
+      needHandle: repo.hasDataHandler.bind(repo),
+      handler: repo.dataHandler.bind(repo),
+    };
+  });
 
   const selectingSource = computed(() => loadingSource.value || curSource.value);
   const showRepoPanel = computed(() => available.value && Boolean(selectingSource.value));
@@ -128,6 +139,7 @@ export const useRepository = defineStore('repository', () => {
       resProgressMap.clear();
       console.log('[Repository] apply:', source);
     } catch (e) {
+      console.error(e);
       if (loadingSource.value !== source) return;
       ElMessage({ message: `Load repo ${source} failed: ${e}`, type: 'error' });
     } finally {
@@ -248,6 +260,7 @@ export const useRepository = defineStore('repository', () => {
     repoList: readonly(curRepoList),
     resList: curResList,
     resProgressMap: readonly(resProgressMap),
+    dataHandler,
     getResource,
     getResources,
     checkNewSourceName,

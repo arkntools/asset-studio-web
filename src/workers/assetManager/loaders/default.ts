@@ -2,6 +2,7 @@ import { AssetType } from '@arkntools/unity-js';
 import type { AssetObject } from '@arkntools/unity-js';
 import type { PreviewDetail } from '@/types/preview';
 import { PreviewType } from '@/types/preview';
+import type { RepoDataHandler } from '@/types/repository';
 import { getLegalFileName } from '../utils/path';
 
 export * from '@/types/preview';
@@ -42,11 +43,12 @@ export class AssetLoader<T extends AssetObject = AssetObject> {
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  async getPreviewData(payload?: any): Promise<any> {
+  async getPreviewData(payload?: any, dataHandler?: RepoDataHandler): Promise<any> {
     return null;
   }
 
-  async export(): Promise<AssetExportItem[] | null> {
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  async export(dataHandler?: RepoDataHandler): Promise<AssetExportItem[] | null> {
     return null;
   }
 }

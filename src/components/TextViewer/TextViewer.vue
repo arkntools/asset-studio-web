@@ -25,6 +25,9 @@ const options: editor.IStandaloneEditorConstructionOptions = {
     invisibleCharacters: false,
     nonBasicASCII: false,
   },
+  largeFileOptimizations: false,
+  foldingMaximumRegions: 65000,
+  tabSize: 2,
 };
 
 let editorInstance: editor.IStandaloneCodeEditor | undefined;
