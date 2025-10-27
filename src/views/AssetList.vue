@@ -56,6 +56,7 @@
           class-name="cell-overflow-visible"
         />
         <vxe-column field="name" title="Name" fixed="left" :min-width="120" sortable :sort-by="sortNameMethod" />
+        <vxe-column field="fileName" title="From file" :min-width="60" sortable />
         <vxe-column field="container" title="Container" :min-width="60" sortable />
         <vxe-column field="type" title="Type" :width="110" sortable :filters="typeFilterOptions" />
         <vxe-column field="pathId" title="PathID" :min-width="60" />
