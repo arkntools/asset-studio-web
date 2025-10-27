@@ -23,6 +23,7 @@ export interface AssetInfo {
   size: number;
   preview: PreviewInfo;
   canExport: boolean;
+  search: string[];
 }
 
 export interface FileLoadingError {
@@ -179,17 +180,19 @@ export class AssetManager {
         .filter(obj => obj.type !== AssetType.AssetBundle)
         .map(async (obj): Promise<AssetInfo> => {
           const { name, type, pathId, size } = obj;
+          const container = bundle.getContainer(pathId);
           const loader = createLoader(obj);
           return {
             ...fileInfo,
             key: `${fileInfo.fileId}_${pathId}`,
             name,
-            container: bundle.getContainer(pathId),
+            container,
             type: AssetType[type] || '',
             pathId,
             size,
             preview: loader.getPreviewInfo(),
             canExport: loader.canExport(),
+            search: [name, container, fileInfo.fileName],
           };
         }),
     );

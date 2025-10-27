@@ -141,10 +141,9 @@ const showProgressBar = useRefDebouncedConditional({
 
 const searchInputRef = useTemplateRef('searchInputRef');
 
+const searchValueGetter = (item: AssetInfo) => item.search;
 const searchedAssetInfos = computed(
-  () =>
-    searchInputRef.value?.doSearch(filteredAssetInfos.value, ({ name, container }) => [name, container]) ||
-    filteredAssetInfos.value,
+  () => searchInputRef.value?.doSearch(filteredAssetInfos.value, searchValueGetter) || filteredAssetInfos.value,
 );
 
 const getAssetNameSortIndex = useNatsort(() => store.assetInfos.map(({ name }) => name));
