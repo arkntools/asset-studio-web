@@ -34,7 +34,12 @@
             title="Goto asset"
             color="#808080"
             :size="14"
-            @click.capture.stop="() => emits('gotoAsset', rowIndex === 0 ? asset.pathId : BigInt(row.value.pathId))"
+            @click.capture.stop="
+              () => {
+                const key = rowIndex === 0 ? asset.key : getAssetInfoByPathId(row.value.pathId)?.key;
+                if (key) emits('gotoAsset', key);
+              }
+            "
           >
             <i-el-promotion />
           </el-icon>
@@ -49,6 +54,7 @@ import { useElementSize } from '@vueuse/core';
 import { mapValues, omit } from 'es-toolkit';
 import { uid } from 'uid';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
+import { useAssetManager } from '@/store/assetManager';
 import { hasSelection } from '@/utils/common';
 import type { AssetInfo } from '@/workers/assetManager';
 import AutoTitle from './AutoTitle.vue';
@@ -63,14 +69,19 @@ interface DumpRow {
   isPPtr: boolean;
 }
 
+defineOptions({
+  inheritAttrs: false,
+});
+
 const { asset } = defineProps<{
   asset: AssetInfo;
-  data: any;
 }>();
 
 const emits = defineEmits<{
-  (e: 'gotoAsset', bigint: bigint): void;
+  (e: 'gotoAsset', key: string): void;
 }>();
+
+const { getAssetInfoByPathId } = useAssetManager();
 
 const tableRef = ref<VxeTableInstance<DumpRow>>();
 const { width: tableWidth } = useElementSize(tableRef);
@@ -213,6 +224,7 @@ const handleMenu: VxeTableEvents.MenuClick<DumpRow> = async ({ $table, menu, row
   .pptr-goto {
     margin-left: 4px;
     padding: 4px;
+    box-sizing: content-box;
     cursor: pointer;
   }
 

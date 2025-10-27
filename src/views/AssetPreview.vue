@@ -11,7 +11,7 @@
           :data="previewData"
           :desc="enablePreview ? undefined : 'Preview disabled'"
           :loading="previewDataLoadingDebounced"
-          @goto-asset="(pathId: any) => emits('gotoAsset', pathId)"
+          @goto-asset="(key: string) => emits('gotoAsset', key)"
           @update-payload="(payload: any) => (previewPayload = payload)"
         />
       </KeepAlive>
@@ -35,7 +35,7 @@ import { useSetting } from '@/store/setting';
 import { PreviewType } from '@/types/preview';
 
 const emits = defineEmits<{
-  (e: 'gotoAsset', pathId: bigint): void;
+  (e: 'gotoAsset', key: string): void;
 }>();
 
 enum PreviewTab {

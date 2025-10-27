@@ -197,6 +197,18 @@ export const useAssetManager = defineStore('assetManager', () => {
     await batchExportAsset(assetInfos.value);
   };
 
+  const getAssetInfoByPathId = (pathId: bigint | string) => {
+    if (typeof pathId !== 'bigint') {
+      try {
+        pathId = BigInt(pathId);
+      } catch {
+        return;
+      }
+    }
+    const info = assetInfos.value.find(info => info.pathId === pathId);
+    return info;
+  };
+
   return {
     assetInfos,
     assetInfoMap,
@@ -211,5 +223,6 @@ export const useAssetManager = defineStore('assetManager', () => {
     batchExportAsset,
     exportAllAssets,
     canExport,
+    getAssetInfoByPathId,
   };
 });

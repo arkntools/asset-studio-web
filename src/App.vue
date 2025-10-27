@@ -12,7 +12,7 @@
           <AssetList ref="listRef" />
         </el-splitter-panel>
         <el-splitter-panel v-model:size="assetPreviewSize" collapsible>
-          <AssetPreview @goto-asset="pathId => listRef?.gotoAsset(pathId)" />
+          <AssetPreview @goto-asset="key => listRef?.gotoAsset(key)" />
         </el-splitter-panel>
       </el-splitter>
     </el-container>

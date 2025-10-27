@@ -288,14 +288,14 @@ const handleBatchExportSelected = () => {
 const highlightRowKey = ref('');
 let highlightTimer: NodeJS.Timeout | null = null;
 
-const gotoAsset = async (pathId: bigint) => {
+const gotoAsset = async (key: string) => {
   const $table = tableRef.value;
   if (!$table) return;
 
-  const info = store.assetInfos.find(i => i.pathId === pathId);
+  const info = $table.getRowById(key);
   if (!info) {
     ElMessage({
-      message: `Unable to find asset with pathId ${pathId}`,
+      message: `Unable to find asset with key ${key}`,
       type: 'error',
       grouping: true,
     });
@@ -308,16 +308,18 @@ const gotoAsset = async (pathId: bigint) => {
     await sleep();
     await sleep();
   }
-  $table.scrollToRow(info);
+
+  await $table.scrollToRow(info);
 
   if (highlightTimer) clearTimeout(highlightTimer);
-  if (highlightRowKey.value === info.key) {
+  if (highlightRowKey.value === key) {
     highlightRowKey.value = '';
     await sleep();
   }
-  highlightRowKey.value = info.key;
+  highlightRowKey.value = key;
   highlightTimer = setTimeout(() => {
     highlightTimer = null;
+    highlightRowKey.value = '';
   }, 1.5e3);
 };
 
