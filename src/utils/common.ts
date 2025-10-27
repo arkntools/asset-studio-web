@@ -11,8 +11,8 @@ export const openUrl = (url: string) => {
   window.open(url, '_blank');
 };
 
-export const getKeysFromMouseEvent = (event: Event) => {
-  const { metaKey, ctrlKey, shiftKey, altKey } = event as MouseEvent;
+export const getKeysFromEvent = (event: Event) => {
+  const { metaKey, ctrlKey, shiftKey, altKey, key } = event as KeyboardEvent;
   const modKey = IS_MAC ? metaKey : ctrlKey;
-  return { modKey, metaKey, ctrlKey, shiftKey, altKey };
+  return { modKey, metaKey, ctrlKey, shiftKey, altKey, key };
 };

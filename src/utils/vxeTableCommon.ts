@@ -1,4 +1,5 @@
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
+import { getKeysFromEvent } from './common';
 
 type VisibleMethodParam = Parameters<NonNullable<VxeTablePropTypes.MenuConfig<any>['visibleMethod']>>[0];
 
@@ -99,3 +100,14 @@ export const handleCommonMenu: VxeTableEvents.MenuClick = async ({ $table, menu,
       break;
   }
 };
+
+export const getKeyDownHandler =
+  ({ onCheckAll }: { onCheckAll?: () => void } = {}): VxeTableEvents.Keydown =>
+  ({ $event, $table }) => {
+    const { modKey, key } = getKeysFromEvent($event);
+    if (modKey && key === 'a' && $table.getData().length) {
+      $event.preventDefault();
+      $table.setAllCheckboxRow(true);
+      onCheckAll?.();
+    }
+  };

@@ -31,7 +31,6 @@
           isHover: true,
         }"
         :column-config="{ resizable: true }"
-        :keyboard-config="{ isArrow: true }"
         :checkbox-config="{ trigger: 'row', highlight: true }"
         :custom-config="{ storage: { visible: true, resizable: true } }"
         :menu-config="menuConfig"
@@ -43,6 +42,7 @@
         @cell-click="handleCellClick"
         @cell-menu="handleCellMenu"
         @cell-dblclick="handleCellDblclick"
+        @keydown="handleKeyDown"
       >
         <vxe-column field="name" title="Name" fixed="left" sortable :sort-by="sortNameMethod">
           <template #default="{ row }">
@@ -81,12 +81,17 @@ import { useLastValue } from '@/hooks/useLastValue';
 import { useNatsort } from '@/hooks/useNatsort';
 import { useAssetManager } from '@/store/assetManager';
 import { useRepository } from '@/store/repository';
-import { getKeysFromMouseEvent } from '@/utils/common';
+import { getKeysFromEvent } from '@/utils/common';
 import { getLegalFileName } from '@/utils/file';
 import { formatSize } from '@/utils/formater';
 import { showBatchFilesResultMessage } from '@/utils/toasts';
 import type { BatchFilesResult } from '@/utils/toasts';
-import { getMenuHeaderConfig, getVxeTableCommonTools, handleCommonMenu } from '@/utils/vxeTableCommon';
+import {
+  getKeyDownHandler,
+  getMenuHeaderConfig,
+  getVxeTableCommonTools,
+  handleCommonMenu,
+} from '@/utils/vxeTableCommon';
 
 const tableRef = ref<VxeTableInstance<ResourceItem>>();
 const { handleHeaderCellClick, menuConfigVisibleMethodProcessHeader } = getVxeTableCommonTools(tableRef);
@@ -161,9 +166,11 @@ watch(
   },
 );
 
+const handleKeyDown = getKeyDownHandler();
+
 const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table, $rowIndex }) => {
   curActiveRow.value = row;
-  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
+  const { modKey, shiftKey } = getKeysFromEvent($event);
   if (modKey) return;
 
   if (shiftKey) {
@@ -184,7 +191,7 @@ const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $e
 };
 
 const handleCellMenu: VxeTableEvents.CellMenu<ResourceItem> = async ({ row, $event, $table }) => {
-  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
+  const { modKey, shiftKey } = getKeysFromEvent($event);
   if (modKey || shiftKey || $table.isCheckedByCheckboxRow(row)) return;
   await $table.clearCheckboxRow();
   await $table.setCheckboxRow(row, true);

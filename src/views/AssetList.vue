@@ -45,6 +45,7 @@
         @header-cell-click="handleHeaderCellClick"
         @checkbox-range-end="updateMultiSelectNum"
         @checkbox-all="updateMultiSelectNum"
+        @keydown="handleKeyDown"
       >
         <vxe-column
           v-if="isMultiSelect"
@@ -103,11 +104,16 @@ import { useNatsort } from '@/hooks/useNatsort';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
-import { getKeysFromMouseEvent, sleep } from '@/utils/common';
+import { getKeysFromEvent, sleep } from '@/utils/common';
 import { getFilesFromDataTransferItems } from '@/utils/file';
 import { formatSize } from '@/utils/formater';
 import { showNotingCanBeExportToast } from '@/utils/toasts';
-import { getMenuHeaderConfig, getVxeTableCommonTools, handleCommonMenu } from '@/utils/vxeTableCommon';
+import {
+  getKeyDownHandler,
+  getMenuHeaderConfig,
+  getVxeTableCommonTools,
+  handleCommonMenu,
+} from '@/utils/vxeTableCommon';
 import type { AssetInfo } from '@/workers/assetManager';
 import ProgressBar from './components/ProgressBar.vue';
 
@@ -161,8 +167,15 @@ const updateMultiSelectNum = () => {
   multiSelectRows.value = tableRef.value!.getCheckboxRecords();
 };
 
+const handleKeyDown = getKeyDownHandler({
+  onCheckAll: () => {
+    isMultiSelect.value = true;
+    updateMultiSelectNum();
+  },
+});
+
 const handleCellClick: VxeTableEvents.CellClick<AssetInfo> = async ({ row, $event }) => {
-  const { modKey, shiftKey } = getKeysFromMouseEvent($event);
+  const { modKey, shiftKey } = getKeysFromEvent($event);
   const $table = tableRef.value!;
   let lastRowIndex: number;
   if (
