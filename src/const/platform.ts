@@ -1,4 +1,3 @@
-const platform: string = (window.navigator as any)?.userAgentData?.platform || window.navigator.platform;
-const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+const platform: string = (window.navigator as any).userAgentData?.platform || window.navigator.platform || '';
 
-export const IS_MAC = macosPlatforms.includes(platform);
+export const IS_MAC = /^mac/i.test(platform);
