@@ -1,5 +1,5 @@
 <template>
-  <div class="image-viewer" :class="`bg-${bgType}`">
+  <div class="image-viewer" :class="{ 'bg-transparent-grid': isBgAlpha }" :style="{ '--bg-color': previewBgColor }">
     <el-image
       class="image"
       :src="useSrc"
@@ -13,25 +13,21 @@
     <div v-if="imageInfo" class="image-info">
       <el-text class="image-info-text" size="large">{{ imageInfo }}</el-text>
     </div>
-    <el-dropdown class="bg-select" placement="bottom-end" trigger="click">
-      <el-button class="bg-select-btn" type="primary" link
-        >BG<el-icon><i-el-arrow-down /></el-icon
-      ></el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="bgType = 'transparent'">Transparent</el-dropdown-item>
-          <el-dropdown-item @click="bgType = 'black'">Black</el-dropdown-item>
-          <el-dropdown-item @click="bgType = 'white'">White</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
+    <ColorPicker
+      v-model="bgColor"
+      v-model:preview="previewBgColor"
+      class="bg-select"
+      :predefine="['#00000000', '#ffffffff', '#808080ff', '#000000ff']"
+    />
     <DownloadButton @click="handleDownload" />
     <FullSizeLoading :loading="!src" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useLocalStorage } from '@vueuse/core';
 import { saveAs } from 'file-saver';
+import ColorPicker from './ColorPicker.vue';
 import DownloadButton from './DownloadButton.vue';
 import FullSizeLoading from './FullSizeLoading.vue';
 
@@ -43,10 +39,16 @@ const { src, name } = defineProps<{
 const PNG_1PX =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC';
 
+const bgColor = useLocalStorage('image-viewer-bg-color', '#00000000', { writeDefaults: false });
+const previewBgColor = ref('');
+const isBgAlpha = computed(() => {
+  const color = previewBgColor.value;
+  return color && !color.endsWith('ff');
+});
+
 const useSrc = computed(() => src || PNG_1PX);
 
 const imageInfo = ref('');
-const bgType = ref('transparent');
 
 const handleLoad = (e: Event) => {
   const img = e.target as HTMLImageElement;
@@ -66,36 +68,16 @@ const handleDownload = () => {
   width: 100%;
   height: 100%;
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--bg-color);
+  }
+
   :deep(.el-image__placeholder) {
     display: none;
   }
-}
-
-.bg-transparent {
-  $size: 10px;
-  $color: #e3e3e3;
-  background-color: #fff;
-  background-image:
-    linear-gradient(45deg, $color 25%, transparent 25%), linear-gradient(-45deg, $color 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, $color 75%), linear-gradient(-45deg, transparent 75%, $color 75%);
-  background-size: #{$size * 2} #{$size * 2};
-  background-position:
-    0 0,
-    0 #{$size},
-    #{$size} #{-$size},
-    #{-$size} 0;
-}
-
-.bg-black {
-  background-color: #000;
-
-  .image-info-text {
-    color: #fff;
-  }
-}
-
-.bg-white {
-  background-color: #fff;
 }
 
 .image {
@@ -118,11 +100,7 @@ const handleDownload = () => {
 
 .bg-select {
   position: absolute;
-  top: 0;
-  right: 0;
-
-  &-btn {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  }
+  top: 8px;
+  right: 8px;
 }
 </style>
