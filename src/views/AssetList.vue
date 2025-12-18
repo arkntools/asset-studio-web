@@ -61,7 +61,7 @@
         <vxe-column field="container" title="Container" :min-width="60" sortable />
         <vxe-column field="type" title="Type" :width="110" sortable :filters="typeFilterOptions" />
         <vxe-column field="pathId" title="PathID" :min-width="60" />
-        <vxe-column field="size" title="Size" align="right" header-align="left" :width="80" sortable>
+        <vxe-column field="size" title="Size" align="right" header-align="left" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.size) }}
           </template>

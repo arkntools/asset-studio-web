@@ -52,12 +52,12 @@
             </div>
           </template>
         </vxe-column>
-        <vxe-column field="size" title="Size" align="right" :width="80" sortable>
+        <vxe-column field="size" title="Size" align="right" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.size) }}
           </template>
         </vxe-column>
-        <vxe-column field="abSize" title="AB Size" align="right" :width="80" sortable>
+        <vxe-column field="abSize" title="AB Size" align="right" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.abSize) }}
           </template>
