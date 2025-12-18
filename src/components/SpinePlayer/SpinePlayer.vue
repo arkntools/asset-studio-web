@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import '@/lib/spine-player/index.css';
-import { useElementSize, useEventListener } from '@vueuse/core';
+import { useElementSize, useEventListener, useMouseInElement } from '@vueuse/core';
 import { clamp, isJSON } from 'es-toolkit';
 import spine from '@/lib/spine-player';
 
@@ -29,7 +29,13 @@ const animationHeight = ref(0);
 const scale = defineModel<number>('scale', { default: 1 });
 const scaleValue = computed(() => scale.value ** (scale.value > 1 ? 2 : 0.5));
 
+const { isOutside } = useMouseInElement(container, {
+  handleOutside: false,
+  windowScroll: false,
+});
+
 useEventListener(window, 'wheel', e => {
+  if (isOutside.value) return;
   const up = e.deltaY > 0;
   scale.value = clamp(Math.round(scale.value * 10 + (up ? -1 : 1)), 1, 19) / 10;
 });
