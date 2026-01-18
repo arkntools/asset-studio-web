@@ -9,8 +9,19 @@ export enum FsbConvertFormat {
   MP3 = 'mp3',
 }
 
+export interface Settings {
+  enablePreview: boolean;
+  hideNamelessAssets: boolean;
+  exportGroupMethod: ExportGroupMethod;
+  unityCNKeyEnabled: boolean;
+  unityCNKey: string;
+  unityEnv: BundleEnv;
+  fsbConvertFormat: FsbConvertFormat;
+  fsbConvertVbrQuality: number;
+}
+
 export const useSetting = defineStore('setting', () => {
-  const data = useLocalStorage(
+  const data = useLocalStorage<Settings>(
     'settings',
     {
       enablePreview: true,

@@ -1,3 +1,4 @@
+import type { BundleLoadOptions } from '@arkntools/unity-js';
 import { proxy, transfer, wrap } from 'comlink';
 import { defineStore } from 'pinia';
 import type { RepoDataHandler } from '@/types/repository';
@@ -60,7 +61,7 @@ export const useAssetManager = defineStore('assetManager', () => {
     });
   });
 
-  const loadFiles = async (files: File[]) => {
+  const loadFiles = async (files: File[], loadOptions?: BundleLoadOptions) => {
     if (isLoading.value) return;
     isLoading.value = true;
     curAssetInfo.value = undefined;
@@ -72,6 +73,7 @@ export const useAssetManager = defineStore('assetManager', () => {
         {
           unityCNKey: setting.unityCNKey,
           env: setting.data.unityEnv,
+          ...loadOptions,
         },
         onProgress,
       );

@@ -23,6 +23,7 @@ import type { MenuDropdownConfigItem } from '@/components/MenuDropdown.vue';
 import { useRepoMenuItems } from '@/hooks/useRepoMenuItems';
 import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
+import type { Settings } from '@/store/setting';
 import { openUrl } from '@/utils/common';
 import ExportOptionsDialog from './components/ExportOptionsDialog.vue';
 import UnityCNOptionsDialog from './components/UnityCNOptionsDialog.vue';
@@ -53,11 +54,7 @@ onFileChange(loadFiles);
 const { open: openFolder, onChange: onFolderChange } = useFileDialog({ directory: true, reset: true });
 onFolderChange(loadFiles);
 
-const getEnvMenuItem = (
-  name: string,
-  value: (typeof setting.data)['unityEnv'],
-  divided?: boolean,
-): MenuDropdownConfigItem => ({
+const getEnvMenuItem = (name: string, value: Settings['unityEnv'], divided?: boolean): MenuDropdownConfigItem => ({
   name,
   divided,
   handler: () => {

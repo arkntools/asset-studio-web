@@ -247,7 +247,7 @@ const downloadRes = async (rows: ResourceItem[]) => {
 const loadRes = async (rows: ResourceItem[]) => {
   const files = await repoManager.getResources({ items: rows });
   if (!files?.length) return;
-  await assetManager.loadFiles(files);
+  await assetManager.loadFiles(files, repoManager.repo?.loadOptions);
 };
 
 const repoListOptions = computed(() =>
