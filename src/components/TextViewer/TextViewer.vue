@@ -6,7 +6,7 @@
 import '@/setup/monacoEditor';
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor';
 import { isJSON } from 'es-toolkit';
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
+import type { editor } from 'monaco-editor';
 
 const props = defineProps<{
   value: string;
