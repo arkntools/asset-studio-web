@@ -50,6 +50,7 @@ const wrapStorage = (source: Ref<string | number>) => {
 const storageOptions: UseStorageOptions<any> = {
   writeDefaults: false,
   serializer: StorageSerializers.object,
+  listenToStorageChanges: false,
 };
 
 const resourceListSize = wrapStorage(useLocalStorage('app-panel-size-resourceList', '25%', storageOptions));

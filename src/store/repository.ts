@@ -32,12 +32,16 @@ export const useRepository = defineStore('repository', () => {
   const sourceUrlSet = computed(() => new Set(sourceList.value.map(source => source.url)));
 
   const loadingSource = ref('');
-  const curSource = useLocalStorage('repo-cur-source', '', { writeDefaults: false });
+  const curSource = useLocalStorage('repo-cur-source', '', {
+    writeDefaults: false,
+    listenToStorageChanges: false,
+  });
   const curRepoList = shallowRef<RepositoryItem[]>([]);
   const curRepoMap = computed(() => keyBy(curRepoList.value, repo => repo.id));
   const curRepoId = useLocalStorage(() => `repo-cur-repo-id-${curSource.value}`, '', {
     writeDefaults: false,
     flush: 'sync',
+    listenToStorageChanges: false,
   });
   const curRepo = computed<RepositoryItem | undefined>(() => curRepoMap.value[curRepoId.value]);
   const resListLoading = ref(false);

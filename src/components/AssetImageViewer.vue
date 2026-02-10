@@ -34,7 +34,10 @@ const emits = defineEmits<{
 
 const menuRef = useTemplateRef('menu');
 
-const menuWidth = useLocalStorage('asset-image-viewer-menu-width', 200, { writeDefaults: false });
+const menuWidth = useLocalStorage('asset-image-viewer-menu-width', 200, {
+  writeDefaults: false,
+  listenToStorageChanges: false,
+});
 
 const imgList = computed(() => (asset.preview.type === PreviewType.ImageList ? asset.preview.detail : []));
 const imgMap = computed(() => new Map(imgList.value.map(item => [item.key, item])));
