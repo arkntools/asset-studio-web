@@ -1,6 +1,6 @@
 import type { MaybePromise, RepositoryItem, ResourceItem } from '@arkntools/as-web-repo';
 import { computedAsync, useLocalStorage } from '@vueuse/core';
-import { isNotNil, keyBy, pull, retry } from 'es-toolkit';
+import { isNotNil, keyBy, remove, retry } from 'es-toolkit';
 import { defineStore } from 'pinia';
 import { useRepoAvailable } from '@/hooks/useRepoAvailable';
 import { IdbKV } from '@/utils/idbKV';
@@ -233,7 +233,7 @@ export const useRepository = defineStore('repository', () => {
   };
   const removeSource = (source: RepositorySource) => {
     if (selectingSource.value === source.url) clear();
-    pull(sourceList.value, [source]);
+    remove(sourceList.value, item => item.url === source.url);
     localStorage.removeItem(`repo-cur-repo-id-${source.url}`);
   };
   const selectSource = (source?: RepositorySource) => {
