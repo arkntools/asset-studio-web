@@ -129,6 +129,10 @@ export const useRepository = defineStore('repository', () => {
     },
   );
 
+  watch(curResList, () => {
+    resProgressMap.clear();
+  });
+
   const applySource = async (source: string) => {
     try {
       loadingSource.value = source;
