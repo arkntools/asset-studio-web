@@ -119,7 +119,11 @@ const menuConfig = markRaw<MenuBarConfig>([
   {
     name: 'Env',
     icon: true,
-    items: [getEnvMenuItem('None', BundleEnv.NONE), getEnvMenuItem('Arknights', BundleEnv.ARKNIGHTS, true)],
+    items: [
+      getEnvMenuItem('None', BundleEnv.NONE),
+      getEnvMenuItem('Arknights', BundleEnv.ARKNIGHTS, true),
+      getEnvMenuItem('Arknights Endfield', BundleEnv.ARKNIGHTS_ENDFIELD),
+    ],
   },
   {
     name: 'Export',

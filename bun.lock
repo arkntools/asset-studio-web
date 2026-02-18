@@ -5,7 +5,7 @@
     "": {
       "name": "as-web",
       "dependencies": {
-        "@arkntools/unity-js": "^4.1.1",
+        "@arkntools/unity-js": "^5.0.0",
         "@guolao/vue-monaco-editor": "^1.6.0",
         "@iconify-json/ep": "^1.2.3",
         "@jimp/core": "^1.6.0",
@@ -76,7 +76,7 @@
 
     "@arkntools/lame-wasm": ["@arkntools/lame-wasm@1.0.2", "", {}, "sha512-N3QENyQYAy0I/4QjbknIg2lLYcWlSvQu6zx/jUmsEGNxME+oUoQR9DehDVdDaEyo2yX2Y3lpmCrqom3TAv0d5w=="],
 
-    "@arkntools/unity-js": ["@arkntools/unity-js@4.1.1", "", { "dependencies": { "@arkntools/fmod": "^1.0.4", "@arkntools/lame-wasm": "^1.0.2", "@arkntools/unity-js-tools": "^3.2.0", "@jimp/core": "^1.6.0", "@jimp/js-png": "^1.6.0", "@jimp/plugin-crop": "^1.6.0", "@jimp/plugin-flip": "^1.6.0", "@jimp/plugin-resize": "^1.6.0", "@jimp/plugin-rotate": "^1.6.0", "@jimp/types": "^1.6.0", "@jimp/wasm-png": "^1.6.0", "aes-js": "^3.1.2", "es-toolkit": "^1.40.0", "jszip": "^3.10.1" }, "optionalDependencies": { "node-web-audio-api": "^1.0.4" } }, "sha512-+y6Z1HFnKT2hnMG41V9B/7XJEDqvigHNV1TC9ekMVTweHp7c8SBLctgOOY5gnOKrHwvQDdTLG/r2F4b+veUcJw=="],
+    "@arkntools/unity-js": ["@arkntools/unity-js@5.0.0", "", { "dependencies": { "@arkntools/fmod": "^1.0.4", "@arkntools/lame-wasm": "^1.0.2", "@arkntools/unity-js-tools": "^3.2.0", "@jimp/core": "^1.6.0", "@jimp/js-png": "^1.6.0", "@jimp/plugin-crop": "^1.6.0", "@jimp/plugin-flip": "^1.6.0", "@jimp/plugin-resize": "^1.6.0", "@jimp/plugin-rotate": "^1.6.0", "@jimp/types": "^1.6.0", "@jimp/wasm-png": "^1.6.0", "aes-js": "^3.1.2", "es-toolkit": "^1.44.0", "jszip": "^3.10.1" }, "optionalDependencies": { "node-web-audio-api": "^1.0.4" } }, "sha512-bn/OA9qahZa8VRmisSg2f7uZeGt4Rn1e5qMtsImxITfdiw8GfsuAVXuup/FOFIJ1dPRc5MXfDLBMyeGLAjCmIA=="],
 
     "@arkntools/unity-js-tools": ["@arkntools/unity-js-tools@3.2.0", "", { "dependencies": { "@arkntools/unity-js-tools-wasm": "3.2.0" } }, "sha512-FzWRWQF+bicVwYAa+LTmyXjlxZ4U+Bf4NCvg/X9JspEwRD7TXCcTeL2Rn2ZQGVkDa24rDIPnfd1gYHfMuY6CPQ=="],
 
@@ -1935,8 +1935,6 @@
     "zwitch": ["zwitch@2.0.4", "", {}, "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="],
 
     "@apideck/better-ajv-errors/ajv": ["ajv@8.17.1", "", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
-
-    "@arkntools/unity-js/es-toolkit": ["es-toolkit@1.40.0", "", {}, "sha512-8o6w0KFmU0CiIl0/Q/BCEOabF2IJaELM1T2PWj6e8KqzHv1gdx+7JtFnDwOx1kJH/isJ5NwlDG1nCr1HrRF94Q=="],
 
     "@babel/code-frame/@babel/helper-validator-identifier": ["@babel/helper-validator-identifier@7.27.1", "", {}, "sha512-D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow=="],
 
