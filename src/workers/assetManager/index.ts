@@ -1,5 +1,5 @@
 import { AssetType, loadAssetBundle } from '@arkntools/unity-js';
-import type { AssetObject, Bundle, BundleLoadOptions } from '@arkntools/unity-js';
+import type { AssetFile, AssetFileLoadOptions, AssetObject } from '@arkntools/unity-js';
 import type { FsbConvertFormat } from '@arkntools/unity-js/audio';
 import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import { expose } from 'comlink';
@@ -40,7 +40,7 @@ type ObjectPathGetter = (obj: AssetObject, fileName: string) => string;
 const THREAD_NUM = Math.max(navigator.hardwareConcurrency, 1);
 
 export class AssetManager {
-  private bundleMap = new Map<string, Bundle>();
+  private bundleMap = new Map<string, AssetFile>();
 
   static setFsbConverter(fsbConverter: (typeof AudioClipLoader)['fsbConverter']) {
     AudioClipLoader.fsbConverter = fsbConverter;
@@ -55,7 +55,7 @@ export class AssetManager {
     clearCache();
   }
 
-  async loadFiles(files: File[], options: BundleLoadOptions, onProgress: FileLoadingOnProgress) {
+  async loadFiles(files: File[], options: AssetFileLoadOptions, onProgress: FileLoadingOnProgress) {
     const errors: Array<FileLoadingError> = [];
     const infos: AssetInfo[] = [];
     let successNum = 0;
@@ -167,7 +167,7 @@ export class AssetManager {
     return this.bundleMap.get(fileId)?.objectMap.get(pathId);
   }
 
-  private async loadFile(file: File, options?: BundleLoadOptions) {
+  private async loadFile(file: File, options?: AssetFileLoadOptions) {
     const buffer = await file.arrayBuffer();
     const md5 = calcMd5(buffer);
 
