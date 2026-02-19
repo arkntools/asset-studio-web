@@ -5,7 +5,7 @@
     "": {
       "name": "as-web",
       "dependencies": {
-        "@arkntools/unity-js": "^5.0.0",
+        "@arkntools/unity-js": "^5.1.0",
         "@guolao/vue-monaco-editor": "^1.6.0",
         "@iconify-json/ep": "^1.2.3",
         "@jimp/core": "^1.6.0",
@@ -76,7 +76,7 @@
 
     "@arkntools/lame-wasm": ["@arkntools/lame-wasm@1.0.2", "", {}, "sha512-N3QENyQYAy0I/4QjbknIg2lLYcWlSvQu6zx/jUmsEGNxME+oUoQR9DehDVdDaEyo2yX2Y3lpmCrqom3TAv0d5w=="],
 
-    "@arkntools/unity-js": ["@arkntools/unity-js@5.0.0", "", { "dependencies": { "@arkntools/fmod": "^1.0.4", "@arkntools/lame-wasm": "^1.0.2", "@arkntools/unity-js-tools": "^3.2.0", "@jimp/core": "^1.6.0", "@jimp/js-png": "^1.6.0", "@jimp/plugin-crop": "^1.6.0", "@jimp/plugin-flip": "^1.6.0", "@jimp/plugin-resize": "^1.6.0", "@jimp/plugin-rotate": "^1.6.0", "@jimp/types": "^1.6.0", "@jimp/wasm-png": "^1.6.0", "aes-js": "^3.1.2", "es-toolkit": "^1.44.0", "jszip": "^3.10.1" }, "optionalDependencies": { "node-web-audio-api": "^1.0.4" } }, "sha512-bn/OA9qahZa8VRmisSg2f7uZeGt4Rn1e5qMtsImxITfdiw8GfsuAVXuup/FOFIJ1dPRc5MXfDLBMyeGLAjCmIA=="],
+    "@arkntools/unity-js": ["@arkntools/unity-js@5.1.0", "", { "dependencies": { "@arkntools/fmod": "^1.0.4", "@arkntools/lame-wasm": "^1.0.2", "@arkntools/unity-js-tools": "^3.2.0", "@jimp/core": "^1.6.0", "@jimp/js-png": "^1.6.0", "@jimp/plugin-crop": "^1.6.0", "@jimp/plugin-flip": "^1.6.0", "@jimp/plugin-resize": "^1.6.0", "@jimp/plugin-rotate": "^1.6.0", "@jimp/types": "^1.6.0", "@jimp/wasm-png": "^1.6.0", "aes-js": "^3.1.2", "es-toolkit": "^1.44.0", "jszip": "^3.10.1" }, "optionalDependencies": { "node-web-audio-api": "^1.0.4" } }, "sha512-VbbxDIdtPbndzrC6xh+VKfpNU6s0A6MP6WY9eILGvhI2JVoEHFr9z6Gz+HO/HEU+p/oV7G2qjRjD3RiwqmXBsw=="],
 
     "@arkntools/unity-js-tools": ["@arkntools/unity-js-tools@3.2.0", "", { "dependencies": { "@arkntools/unity-js-tools-wasm": "3.2.0" } }, "sha512-FzWRWQF+bicVwYAa+LTmyXjlxZ4U+Bf4NCvg/X9JspEwRD7TXCcTeL2Rn2ZQGVkDa24rDIPnfd1gYHfMuY6CPQ=="],
 

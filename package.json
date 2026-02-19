@@ -15,7 +15,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@arkntools/unity-js": "^5.0.0",
+    "@arkntools/unity-js": "^5.1.0",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@iconify-json/ep": "^1.2.3",
     "@jimp/core": "^1.6.0",
