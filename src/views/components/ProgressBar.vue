@@ -7,7 +7,6 @@
     :stroke-width="20"
     :percentage="progress.indeterminate ? 100 : progress.value"
     :format="pct => (progress.indeterminate ? '' : `${pct.toFixed(2)}%`)"
-    :duration="2"
   />
   <div class="progress-desc">{{ progress.desc }}</div>
 </template>
@@ -24,6 +23,10 @@ const progress = useProgress();
   flex-shrink: 0;
   width: 50%;
   max-width: 400px;
+
+  :deep(.el-progress-bar__inner) {
+    transition: none;
+  }
 }
 
 .progress-desc {
