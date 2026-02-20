@@ -45,8 +45,7 @@ watch(
   margin-right: -6px;
 
   :deep(.el-progress-circle__path) {
-    $val: 0.2s;
-    transition: $val, $val, $val !important;
+    transition-duration: 0.2s !important;
   }
 }
 </style>
