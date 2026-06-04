@@ -14,6 +14,7 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 import SvgLoader from 'vite-svg-loader';
 
 const pathSrc = resolve(__dirname, 'src');
+
 const nodePolyfillPlugins = () =>
   nodePolyfills({
     include: ['buffer', 'fs', 'path', 'crypto'],
@@ -92,6 +93,13 @@ export default defineConfig(({ command }) => ({
   worker: {
     format: 'es',
     plugins: () => nodePolyfillPlugins(),
+    rolldownOptions: {
+      transform: {
+        inject: {
+          Buffer: 'vite-plugin-node-polyfills/shims/buffer',
+        },
+      },
+    },
   },
   resolve: {
     alias: {
