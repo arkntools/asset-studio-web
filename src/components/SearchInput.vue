@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import IElSearch from '~icons/ep/search';
 import LetterCaseIcon from '@/assets/letter-case.svg?component';
 import RegexIcon from '@/assets/regex.svg?component';
 import { useRefDebouncedConditional } from '@/hooks/useRef';
+import IElSearch from '~icons/ep/search';
 
 const isError = ref(false);
 const isRegex = ref(false);

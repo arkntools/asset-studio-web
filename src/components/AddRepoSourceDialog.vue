@@ -33,7 +33,7 @@ const form = reactive({
   url: '',
 });
 
-const getUrl = (url: string) => (url.match(/^https?:\/\//) ? url : `https://unpkg.com/${url}`);
+const getUrl = (url: string) => (/^https?:\/\//.test(url) ? url : `https://unpkg.com/${url}`);
 
 const rules: FormRules<typeof form> = {
   name: [

@@ -1,14 +1,14 @@
 import { useToggle } from '@vueuse/core';
+import type AddRepoSourceDialog from '@/components/AddRepoSourceDialog.vue';
+import type { MenuDropdownConfigItem } from '@/components/MenuDropdown.vue';
+import { useRepository } from '@/store/repository';
+import { openUrl } from '@/utils/common';
 import IElDelete from '~icons/ep/delete';
 import IElHelp from '~icons/ep/help';
 import IElMinus from '~icons/ep/minus';
 import IElPlus from '~icons/ep/plus';
 import IElSelect from '~icons/ep/select';
 import IElWarnTriangleFilled from '~icons/ep/warn-triangle-filled';
-import type AddRepoSourceDialog from '@/components/AddRepoSourceDialog.vue';
-import type { MenuDropdownConfigItem } from '@/components/MenuDropdown.vue';
-import { useRepository } from '@/store/repository';
-import { openUrl } from '@/utils/common';
 import { useRepoAvailable } from './useRepoAvailable';
 
 const ifSelectIcon = (condition: boolean, otherwise?: Component) => (condition ? IElSelect : otherwise);

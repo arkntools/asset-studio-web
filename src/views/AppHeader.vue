@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { BundleEnv } from '@arkntools/unity-js';
 import { useFileDialog } from '@vueuse/core';
-import IElSelect from '~icons/ep/select';
 import IconGithub from '@/assets/github.svg';
 import AddRepoSourceDialog from '@/components/AddRepoSourceDialog.vue';
 import MenuBar from '@/components/MenuBar.vue';
@@ -25,6 +24,7 @@ import { useAssetManager } from '@/store/assetManager';
 import { useSetting } from '@/store/setting';
 import type { Settings } from '@/store/setting';
 import { openUrl } from '@/utils/common';
+import IElSelect from '~icons/ep/select';
 import ExportOptionsDialog from './components/ExportOptionsDialog.vue';
 import UnityCNOptionsDialog from './components/UnityCNOptionsDialog.vue';
 

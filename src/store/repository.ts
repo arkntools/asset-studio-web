@@ -15,7 +15,7 @@ const loadRepo = async (source: string): Promise<RepositoryItem[]> => {
   if (import.meta.env.VITE_REPO_DEV_URL) {
     return (await import(/* @vite-ignore */ new URL(import.meta.env.VITE_REPO_DEV_URL, location.href).href)).default;
   }
-  const url = source.match(/^https?:\/\//) ? source : `https://unpkg.com/${source}`;
+  const url = /^https?:\/\//.test(source) ? source : `https://unpkg.com/${source}`;
   return (await import(/* @vite-ignore */ url)).default;
 };
 

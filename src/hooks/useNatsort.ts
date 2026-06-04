@@ -1,5 +1,7 @@
 import { uniq } from 'es-toolkit';
-import natsort from 'natsort';
+import natsortModule from 'natsort';
+
+const natsort: typeof natsortModule = (natsortModule as any).default || natsortModule;
 
 export const useNatsort = (listGetter: () => string[]) => {
   const natsortFn = natsort();

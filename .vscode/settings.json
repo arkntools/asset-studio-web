@@ -3,5 +3,6 @@
     "source.fixAll": "explicit"
   },
   "editor.formatOnSave": true,
-  "npm.packageManager": "bun"
+  "npm.packageManager": "bun",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

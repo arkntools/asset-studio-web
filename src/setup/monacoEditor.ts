@@ -1,3 +1,4 @@
+// @ts-ignore
 import 'monaco-editor/esm/vs/language/json/monaco.contribution';
 import { loader } from '@guolao/vue-monaco-editor';
 // @ts-ignore

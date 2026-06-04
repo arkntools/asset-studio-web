@@ -14,9 +14,24 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 import SvgLoader from 'vite-svg-loader';
 
 const pathSrc = resolve(__dirname, 'src');
+const nodePolyfillPlugins = () =>
+  nodePolyfills({
+    include: ['buffer', 'fs', 'path', 'crypto'],
+    globals: {
+      Buffer: true,
+    },
+    overrides: {
+      fs: 'empty-module',
+      path: 'empty-module',
+      crypto: 'empty-module',
+    },
+  });
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
+  build: {
+    chunkSizeWarningLimit: 5000,
+  },
   plugins: [
     VueDevTools({
       componentInspector: {
@@ -72,20 +87,11 @@ export default defineConfig(({ command }) => ({
       dts: command === 'serve' ? resolve(pathSrc, 'components.d.ts') : false,
     }),
     Icons(),
-    nodePolyfills({
-      include: ['buffer', 'fs', 'path', 'crypto'],
-      globals: {
-        Buffer: true,
-      },
-      overrides: {
-        fs: 'empty-module',
-        path: 'empty-module',
-        crypto: 'empty-module',
-      },
-    }),
+    nodePolyfillPlugins(),
   ],
   worker: {
     format: 'es',
+    plugins: () => nodePolyfillPlugins(),
   },
   resolve: {
     alias: {
