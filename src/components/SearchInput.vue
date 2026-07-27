@@ -70,8 +70,8 @@ const doSearch = <T,>(list: T[], valueGetter: (item: T) => string[]) => {
   if (searchRaw instanceof RegExp) {
     return list.filter(item => valueGetter(item).some(value => searchRaw.test(value)));
   }
-  const searchText = isCaseSensitive.value ? searchRaw : searchRaw.toLowerCase();
-  return list.filter(item => valueGetter(item).some(value => value.includes(searchText)));
+  const cs = isCaseSensitive.value;
+  return list.filter(item => valueGetter(item).some(value => (cs ? value : value.toLowerCase()).includes(searchRaw)));
 };
 
 defineExpose({
