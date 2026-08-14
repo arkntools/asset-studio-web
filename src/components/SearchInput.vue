@@ -93,8 +93,6 @@ defineExpose({
   }
 
   :deep(.el-input__suffix-inner) {
-    flex-direction: row-reverse;
-
     .el-icon {
       position: relative;
 

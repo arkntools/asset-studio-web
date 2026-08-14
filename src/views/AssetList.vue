@@ -4,7 +4,7 @@
       <SearchInput ref="searchInputRef" />
     </div>
     <div class="asset-list-table-main" @dragover.capture.prevent @drop.capture.prevent="handleDropFiles">
-      <vxe-table
+      <VxeTable
         id="asset-list-table"
         ref="tableRef"
         class="asset-list-table"
@@ -33,21 +33,24 @@
         :checkbox-config="
           isMultiSelect ? { trigger: 'row', highlight: true, range: true, isShiftKey: true } : undefined
         "
-        :custom-config="{ storage: { visible: true, resizable: true } }"
-        :scroll-y="{ enabled: true }"
+        :custom-config="{
+          storage: { visible: true, resizable: true },
+          storeOptions: { visible: true, resizable: true },
+        }"
+        :virtual-y-config="{ enabled: true, gt: 0 }"
         show-overflow="title"
-        show-header-overflow
+        show-header-overflow="title"
         @menu-click="handleMenu"
         @header-cell-menu="handleHeaderCellMenu"
         @cell-menu="handleCellMenu"
         @cell-click="handleCellClick"
-        @current-change="handleCurrentChange"
+        @current-row-change="handleCurrentChange"
         @header-cell-click="handleHeaderCellClick"
         @checkbox-range-end="updateMultiSelectNum"
         @checkbox-all="updateMultiSelectNum"
         @keydown="handleKeyDown"
       >
-        <vxe-column
+        <VxeColumn
           v-if="isMultiSelect"
           type="checkbox"
           :width="38"
@@ -56,22 +59,22 @@
           header-class-name="cell-overflow-visible"
           class-name="cell-overflow-visible"
         />
-        <vxe-column field="name" title="Name" fixed="left" :min-width="120" sortable :sort-by="sortNameMethod" />
-        <vxe-column field="fileName" title="From file" :min-width="60" sortable />
-        <vxe-column field="container" title="Container" :min-width="60" sortable />
-        <vxe-column field="type" title="Type" :width="110" sortable :filters="typeFilterOptions" />
-        <vxe-column field="pathId" title="PathID" :min-width="60" />
-        <vxe-column field="size" title="Size" align="right" header-align="left" :width="85" sortable>
+        <VxeColumn field="name" title="Name" fixed="left" :min-width="120" sortable :sort-by="sortNameMethod" />
+        <VxeColumn field="fileName" title="From file" :min-width="60" sortable />
+        <VxeColumn field="container" title="Container" :min-width="60" sortable />
+        <VxeColumn field="type" title="Type" :width="110" sortable :filters="typeFilterOptions" />
+        <VxeColumn field="pathId" title="PathID" :min-width="60" />
+        <VxeColumn field="size" title="Size" align="right" header-align="left" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.size) }}
           </template>
-        </vxe-column>
+        </VxeColumn>
         <template #empty>
           <el-text :style="{ fontSize: '30px', color: 'var(--el-color-info-light-3)' }">
             {{ filteredAssetInfos.length ? 'No data' : 'Drop files here or click "File" menu to load files' }}
           </el-text>
         </template>
-      </vxe-table>
+      </VxeTable>
     </div>
     <div v-if="isMultiSelect" class="asset-list-table-footer wrap">
       <div class="footer-block desc">
@@ -98,6 +101,7 @@
 
 <script setup lang="ts">
 import { identity } from 'es-toolkit';
+import { VxeColumn, VxeTable } from 'vxe-table';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import SearchInput from '@/components/SearchInput.vue';
 import { useNatsort } from '@/hooks/useNatsort';
@@ -281,7 +285,7 @@ const handleCellMenu: VxeTableEvents.CellMenu<AssetInfo> = ({ row, $event }) => 
   setCurrentRow(row);
 };
 
-const handleCurrentChange: VxeTableEvents.CurrentChange<AssetInfo> = ({ row }) => {
+const handleCurrentChange: VxeTableEvents.CurrentRowChange<AssetInfo> = ({ row }) => {
   lastAssetInfo = store.curAssetInfo;
   store.setCurAssetInfo(row);
 };

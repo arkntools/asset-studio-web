@@ -19,7 +19,8 @@ body {
 
 .cell-overflow-visible {
   overflow: visible !important;
-  > .vxe-cell {
+  > .vxe-cell,
+  > .vxe-cell > .vxe-cell--wrapper {
     overflow: visible !important;
   }
 }
@@ -57,4 +58,20 @@ body {
     0 #{$size},
     #{$size} #{-$size},
     #{-$size} 0;
+}
+
+[data-vxe-ui-theme] {
+  --vxe-ui-loading-color: var(--vxe-ui-font-primary-color);
+}
+
+.vxe-table--context-menu-wrapper {
+  .vxe-table--context-menu-group-wrapper,
+  .vxe-table--context-menu-clild-wrapper {
+    li:last-child {
+      border: 1px solid transparent;
+    }
+    li.link--active {
+      border-color: var(--vxe-ui-base-hover-background-color);
+    }
+  }
 }

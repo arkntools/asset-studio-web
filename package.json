@@ -38,7 +38,8 @@
     "pinia": "^4.0.3",
     "uid": "^2.0.2",
     "vue": "^3.5.41",
-    "vxe-table": "4.6.25"
+    "vxe-pc-ui": "~4.16.28",
+    "vxe-table": "~4.20.12"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
@@ -51,7 +52,6 @@
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
-    "@vxecli/import-unplugin-vue-components": "^1.0.4",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
@@ -63,6 +63,7 @@
     "unplugin-icons": "^23.0.1",
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.2.1",
+    "vite-plugin-lazy-import": "^1.0.7",
     "vite-plugin-node-polyfills": "^0.28.0",
     "vite-plugin-pwa": "^1.3.0",
     "vite-plugin-vue-devtools": "^8.2.1",

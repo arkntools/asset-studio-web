@@ -3195,7 +3195,7 @@ var spine;
       if (scale || !percentSpacing) {
         if (scale) lengths = spine.Utils.setArraySize(this.lengths, boneCount);
         var lengthSpacing = data.spacingMode == spine.SpacingMode.Length;
-        for (var i = 0, n = spacesCount - 1; i < n; ) {
+        for (var i = 0, n = spacesCount - 1; i < n;) {
           var bone = bones[i];
           var setupLength = bone.data.length;
           if (setupLength < PathConstraint.epsilon) {
@@ -4942,7 +4942,7 @@ var spine;
       byteCount--;
       var chars = '';
       var charCount = 0;
-      for (var i = 0; i < byteCount; ) {
+      for (var i = 0; i < byteCount;) {
         var b = this.readByte();
         switch (b >> 4) {
           case 12:
@@ -5940,7 +5940,7 @@ var spine;
       }
       var weights = new Array();
       var bones = new Array();
-      for (var i = 0, n = vertices.length; i < n; ) {
+      for (var i = 0, n = vertices.length; i < n;) {
         var boneCount = vertices[i++];
         bones.push(boneCount);
         for (var nn = i + boneCount * 4; i < nn; i += 4) {
@@ -11979,14 +11979,12 @@ var spine;
         this.sceneRenderer.begin();
         if (this.config.backgroundImage && this.config.backgroundImage.url) {
           var bgImage = this.assetManager.get(this.config.backgroundImage.url);
-          if (
-            !(
-              this.config.backgroundImage.hasOwnProperty('x') &&
-              this.config.backgroundImage.hasOwnProperty('y') &&
-              this.config.backgroundImage.hasOwnProperty('width') &&
-              this.config.backgroundImage.hasOwnProperty('height')
-            )
-          ) {
+          if (!(
+            this.config.backgroundImage.hasOwnProperty('x') &&
+            this.config.backgroundImage.hasOwnProperty('y') &&
+            this.config.backgroundImage.hasOwnProperty('width') &&
+            this.config.backgroundImage.hasOwnProperty('height')
+          )) {
             this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
           } else {
             this.sceneRenderer.drawTexture(

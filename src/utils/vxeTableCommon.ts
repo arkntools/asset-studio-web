@@ -75,7 +75,7 @@ export const getMenuHeaderConfig = (): VxeTablePropTypes.MenuConfig['header'] =>
   ],
 });
 
-export const handleCommonMenu: VxeTableEvents.MenuClick = async ({ $table, menu, row, column }) => {
+export const handleCommonMenu: VxeTableEvents.MenuClick<any> = async ({ $table, menu, row, column }) => {
   switch (menu.code) {
     case 'copy':
       await navigator.clipboard.writeText(String(row[column.field]));

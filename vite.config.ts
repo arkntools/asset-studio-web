@@ -1,13 +1,13 @@
 import { resolve } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import Vue from '@vitejs/plugin-vue';
-import { VxeResolver } from '@vxecli/import-unplugin-vue-components';
 import AutoImport from 'unplugin-auto-import/vite';
 import IconsResolver from 'unplugin-icons/resolver';
 import Icons from 'unplugin-icons/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
+import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import VueDevTools from 'vite-plugin-vue-devtools';
@@ -65,6 +65,9 @@ export default defineConfig(({ command }) => ({
       },
     }),
     Vue(),
+    lazyImport({
+      resolvers: [VxeResolver({ libraryName: 'vxe-table' }), VxeResolver({ libraryName: 'vxe-pc-ui' })],
+    }),
     SvgLoader(),
     AutoImport({
       imports: ['vue'],
@@ -80,11 +83,7 @@ export default defineConfig(({ command }) => ({
     }),
     Components({
       dirs: [],
-      resolvers: [
-        IconsResolver({ enabledCollections: ['ep'], alias: { el: 'ep' } }),
-        ElementPlusResolver(),
-        VxeResolver({ libraryName: 'vxe-table', importStyle: true }),
-      ],
+      resolvers: [IconsResolver({ enabledCollections: ['ep'], alias: { el: 'ep' } }), ElementPlusResolver()],
       dts: command === 'serve' ? resolve(srcPath, 'components.d.ts') : false,
     }),
     Icons(),

@@ -1,42 +1,43 @@
 <template>
-  <vxe-table
+  <VxeTable
     ref="tableRef"
     class="asset-dump-table"
     cell-class-name="asset-dump-table__cell"
-    :row-class-name="({ rowIndex }) => ({ 'is-root': rowIndex === 0 })"
+    :row-class-name="({ row }) => ({ 'is-root': !row.parentId })"
     border="none"
     size="mini"
     height="100%"
     :data="dumpRows"
     :show-header="false"
     :column-config="{ resizable: true }"
+    :cell-config="{ padding: false }"
     :row-config="{ useKey: true, keyField: 'id', isHover: true }"
     :tree-config="{ transform: true, rowField: 'id', parentField: 'parentId' }"
     :menu-config="menuConfig"
-    :scroll-y="{ enabled: true }"
+    :virtual-y-config="{ enabled: true, gt: 0 }"
     @cell-click="handleCellClick"
     @menu-click="handleMenu"
   >
-    <vxe-column field="name" tree-node>
-      <template #default="{ row, rowIndex }">
+    <VxeColumn field="name" tree-node>
+      <template #default="{ row }">
         <div class="dump">
-          <span class="key" :class="{ ellipsis: rowIndex === 0 }">{{ row.name }}</span>
+          <span class="key" :class="{ ellipsis: !row.parentId }">{{ row.name }}</span>
           <span class="colon">:&nbsp;</span>
           <AutoTitle
             class="value"
-            :class="{ [row.type]: true, ellipsis: rowIndex !== 0 }"
+            :class="{ [row.type]: true, ellipsis: !!row.parentId }"
             :text="row.valueText"
             :resize-trigger="tableWidth"
           />
           <el-icon
-            v-if="row.isPPtr || rowIndex === 0"
+            v-if="row.isPPtr || !row.parentId"
             class="pptr-goto"
             title="Goto asset"
             color="#808080"
             :size="14"
             @click.capture.stop="
               () => {
-                const key = rowIndex === 0 ? asset.key : getAssetInfoByPathId(row.value.pathId)?.key;
+                const key = !row.parentId ? asset.key : getAssetInfoByPathId(row.value.pathId)?.key;
                 if (key) emits('gotoAsset', key);
               }
             "
@@ -45,14 +46,15 @@
           </el-icon>
         </div>
       </template>
-    </vxe-column>
-  </vxe-table>
+    </VxeColumn>
+  </VxeTable>
 </template>
 
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core';
 import { mapValues, omit } from 'es-toolkit';
 import { uid } from 'uid';
+import { VxeColumn, VxeTable } from 'vxe-table';
 import type { VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import { useAssetManager } from '@/store/assetManager';
 import { hasSelection } from '@/utils/common';
@@ -207,12 +209,16 @@ const handleMenu: VxeTableEvents.MenuClick<DumpRow> = async ({ $table, menu, row
 
 <style lang="scss" scoped>
 .asset-dump-table {
-  --vxe-table-row-height-mini: 22px;
+  --vxe-ui-table-row-height-mini: 22px;
   user-select: text;
 
   :deep(.asset-dump-table__cell) {
     padding: 0 !important;
     font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+    .vxe-cell {
+      padding: 0 !important;
+    }
   }
 }
 

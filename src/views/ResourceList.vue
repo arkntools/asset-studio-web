@@ -15,7 +15,7 @@
       />
     </div>
     <div class="resource-list-main">
-      <vxe-table
+      <VxeTable
         id="resource-list-table"
         ref="tableRef"
         class="resource-list-table"
@@ -32,11 +32,14 @@
         }"
         :column-config="{ resizable: true }"
         :checkbox-config="{ trigger: 'row', highlight: true }"
-        :custom-config="{ storage: { visible: true, resizable: true } }"
+        :custom-config="{
+          storage: { visible: true, resizable: true },
+          storeOptions: { visible: true, resizable: true },
+        }"
         :menu-config="menuConfig"
-        :scroll-y="{ enabled: true }"
+        :virtual-y-config="{ enabled: true, gt: 0 }"
         show-overflow="title"
-        show-header-overflow
+        show-header-overflow="title"
         @header-cell-click="handleHeaderCellClick"
         @menu-click="handleMenu"
         @cell-click="handleCellClick"
@@ -44,28 +47,28 @@
         @cell-dblclick="handleCellDblclick"
         @keydown="handleKeyDown"
       >
-        <vxe-column field="name" title="Name" fixed="left" sortable :sort-by="sortNameMethod">
+        <VxeColumn field="name" title="Name" fixed="left" sortable :sort-by="sortNameMethod">
           <template #default="{ row }">
             <div class="resource-list-table__cell-name">
               <div class="res-name">{{ row.name }}</div>
               <ResourceFetchProgress :value="repoManager.resProgressMap.get(row.id)" />
             </div>
           </template>
-        </vxe-column>
-        <vxe-column field="size" title="Size" align="right" :width="85" sortable>
+        </VxeColumn>
+        <VxeColumn field="size" title="Size" align="right" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.size) }}
           </template>
-        </vxe-column>
-        <vxe-column field="abSize" title="AB Size" align="right" :width="85" sortable>
+        </VxeColumn>
+        <VxeColumn field="abSize" title="AB Size" align="right" :width="85" sortable>
           <template #default="{ row }">
             {{ formatSize(row.abSize) }}
           </template>
-        </vxe-column>
+        </VxeColumn>
         <template #empty>
           <el-empty description="No data" />
         </template>
-      </vxe-table>
+      </VxeTable>
     </div>
   </div>
 </template>
@@ -74,6 +77,7 @@
 import type { ResourceItem } from '@arkntools/as-web-repo';
 import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import { saveAs } from 'file-saver';
+import { VxeColumn, VxeTable } from 'vxe-table';
 import type { VxeColumnPropTypes, VxeTableEvents, VxeTableInstance, VxeTablePropTypes } from 'vxe-table';
 import ResourceFetchProgress from '@/components/ResourceFetchProgress.vue';
 import SearchInput from '@/components/SearchInput.vue';
@@ -168,7 +172,7 @@ watch(
 
 const handleKeyDown = getKeyDownHandler();
 
-const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table, $rowIndex }) => {
+const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $event, $table }) => {
   curActiveRow.value = row;
   const { modKey, shiftKey } = getKeysFromEvent($event);
   if (modKey) return;
@@ -176,10 +180,11 @@ const handleCellClick: VxeTableEvents.CellClick<ResourceItem> = async ({ row, $e
   if (shiftKey) {
     let lastRowIndex: number;
     if (lastActiveRow.value && (lastRowIndex = $table.getVTRowIndex(lastActiveRow.value)) >= 0) {
+      const rowIndex = $table.getVTRowIndex(row);
       const { visibleData } = $table.getTableData();
       await $table.clearCheckboxRow();
       await $table.setCheckboxRow(
-        visibleData.slice(Math.min(lastRowIndex, $rowIndex), Math.max(lastRowIndex, $rowIndex) + 1),
+        visibleData.slice(Math.min(lastRowIndex, rowIndex), Math.max(lastRowIndex, rowIndex) + 1),
         true,
       );
       return;
@@ -301,8 +306,8 @@ const repoListOptions = computed(() =>
 }
 
 .resource-list-table {
-  --vxe-table-row-checkbox-checked-background-color: var(--vxe-table-row-current-background-color);
-  --vxe-table-row-hover-checkbox-checked-background-color: var(--vxe-table-row-hover-current-background-color);
+  --vxe-ui-table-row-checkbox-checked-background-color: var(--vxe-ui-table-row-current-background-color);
+  --vxe-ui-table-row-hover-checkbox-checked-background-color: var(--vxe-ui-table-row-hover-current-background-color);
 }
 
 .resource-list-table__cell-name {

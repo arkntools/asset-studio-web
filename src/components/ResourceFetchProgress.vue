@@ -42,7 +42,6 @@ watch(
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  margin-right: -6px;
 
   :deep(.el-progress-circle__path) {
     transition-duration: 0.2s !important;

@@ -1,22 +1,22 @@
-import type { Plugin } from 'vue';
-import { setConfig } from 'vxe-table/es/v-x-e-table';
-import VxeTableFilterModule from 'vxe-table/es/vxe-table-filter-module';
-import VxeTableKeyboardModule from 'vxe-table/es/vxe-table-keyboard-module';
-import VxeTableMenuModule from 'vxe-table/es/vxe-table-menu-module';
+import { VxeLoading } from 'vxe-pc-ui';
+import { VxeUI } from 'vxe-table';
 
 const i18nTable: Record<string, string | undefined> = {
   'vxe.table.allFilter': 'All',
+  'vxe.table.allTitle': 'All',
   'vxe.table.confirmFilter': 'Apply',
   'vxe.table.resetFilter': 'Reset',
   'vxe.loading.text': 'Loading',
 };
 
-setConfig({
+VxeUI.setConfig({
   i18n: key => i18nTable[key] ?? (import.meta.env.DEV ? key : ''),
+  table: {
+    menuConfig: {
+      transfer: true,
+    },
+  },
 });
 
-export const VxeTableModules: Plugin = app => {
-  app.use(VxeTableKeyboardModule);
-  app.use(VxeTableMenuModule);
-  app.use(VxeTableFilterModule);
-};
+// Table loading overlay is resolved via VxeUI.getComponent('VxeLoading').
+VxeUI.component(VxeLoading);
