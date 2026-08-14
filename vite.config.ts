@@ -13,7 +13,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import VueDevTools from 'vite-plugin-vue-devtools';
 import SvgLoader from 'vite-svg-loader';
 
-const pathSrc = resolve(__dirname, 'src');
+const srcPath = fileURLToPath(new URL('./src', import.meta.url));
 
 const nodePolyfillPlugins = () =>
   nodePolyfills({
@@ -71,10 +71,10 @@ export default defineConfig(({ command }) => ({
       dirs: [],
       resolvers: [ElementPlusResolver()],
       vueTemplate: true,
-      dts: command === 'serve' ? resolve(pathSrc, 'auto-imports.d.ts') : false,
+      dts: command === 'serve' ? resolve(srcPath, 'auto-imports.d.ts') : false,
       eslintrc: {
         enabled: false,
-        filepath: resolve(__dirname, 'eslint.config.autoImport.json'),
+        filepath: fileURLToPath(new URL('./eslint.config.autoImport.json', import.meta.url)),
         globalsPropValue: 'readonly',
       },
     }),
@@ -85,7 +85,7 @@ export default defineConfig(({ command }) => ({
         ElementPlusResolver(),
         VxeResolver({ libraryName: 'vxe-table', importStyle: true }),
       ],
-      dts: command === 'serve' ? resolve(pathSrc, 'components.d.ts') : false,
+      dts: command === 'serve' ? resolve(srcPath, 'components.d.ts') : false,
     }),
     Icons(),
     nodePolyfillPlugins(),
