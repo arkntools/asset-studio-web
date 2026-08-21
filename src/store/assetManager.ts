@@ -1,5 +1,5 @@
 import type { AssetFileLoadOptions } from '@arkntools/unity-js';
-import { proxy, transfer, wrap } from 'comlink';
+import { proxy, wrap } from 'comlink';
 import { defineStore } from 'pinia';
 import type { RepoDataHandler } from '@/types/repository';
 import { showBatchFilesResultMessage, showNotingCanBeExportToast } from '@/utils/toasts';
@@ -31,22 +31,13 @@ export const useAssetManager = defineStore('assetManager', () => {
 
   const assetInfoMap = computed(() => new Map(assetInfos.value.map(info => [info.key, info])));
 
-  AssetManager.setFsbConverter(
-    proxy(async (params, isPreview) => {
-      const { convertFsb, FsbConvertFormat } = await import('@arkntools/unity-js/audio');
-      const data = await convertFsb(
-        params,
-        isPreview ? FsbConvertFormat.WAV : setting.data.fsbConvertFormat,
-        isPreview ? undefined : { vbrQuality: setting.data.fsbConvertVbrQuality as any },
-      );
-      return transfer(data, [data.buffer]);
-    }),
-  );
-
   watch(
-    () => setting.data.fsbConvertFormat,
-    () => {
-      AssetManager.setFsbConvertFormat(setting.data.fsbConvertFormat);
+    () => ({
+      format: setting.data.fsbConvertFormat,
+      vbrQuality: setting.data.fsbConvertVbrQuality,
+    }),
+    settings => {
+      AssetManager.setFsbConvertSettings(settings);
     },
     { immediate: true },
   );

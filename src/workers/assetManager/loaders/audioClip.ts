@@ -1,5 +1,5 @@
 import type { AudioClip, AudioClipGetResult } from '@arkntools/unity-js';
-import type { FsbConvertFormat } from '@arkntools/unity-js/audio';
+import { convertFsb, FsbConvertFormat } from '@arkntools/unity-js/audio';
 import { blobCache } from '../utils/cache';
 import type { CacheKey } from '../utils/cache';
 import { AssetLoader, PreviewType } from './default';
@@ -13,9 +13,13 @@ const mimeMap: Record<string, string | undefined> = {
 
 const getMimeType = (format: string) => mimeMap[format] ?? `audio/${format}`;
 
+export interface FsbConvertSettings {
+  format: FsbConvertFormat;
+  vbrQuality: number;
+}
+
 export class AudioClipLoader extends AssetLoader<AudioClip> {
-  static fsbConverter: (params: AudioClipGetResult, isPreview?: boolean) => Promise<Uint8Array<ArrayBuffer>>;
-  static convertFormat: FsbConvertFormat;
+  static convertSettings: FsbConvertSettings;
 
   private get cacheKey(): CacheKey {
     return {
@@ -28,15 +32,15 @@ export class AudioClipLoader extends AssetLoader<AudioClip> {
   }
 
   override async export(): Promise<AssetExportItem[] | null> {
-    const { convertFormat } = AudioClipLoader;
+    const { format } = AudioClipLoader.convertSettings;
     let blob = blobCache.get(this.cacheKey)?.blob;
 
-    if (convertFormat !== 'wav' || !blob) {
+    if (format !== 'wav' || !blob) {
       blob = await this.getAudioBlob();
       if (!blob) return null;
     }
 
-    const ext = this.object.format === 'fsb' ? convertFormat : this.object.format;
+    const ext = this.object.format === 'fsb' ? format : this.object.format;
 
     return [
       {
@@ -67,16 +71,26 @@ export class AudioClipLoader extends AssetLoader<AudioClip> {
     const audio = this.object.getAudio();
 
     try {
-      return new Blob([audio.format === 'fsb' ? await AudioClipLoader.fsbConverter(audio, isPreview) : audio.data], {
+      const data = audio.format === 'fsb' ? await this.convertFsb(audio, isPreview) : audio.data;
+      return new Blob([data], {
         type:
           audio.format === 'fsb'
             ? isPreview
               ? mimeMap.wav
-              : getMimeType(AudioClipLoader.convertFormat)
+              : getMimeType(AudioClipLoader.convertSettings.format)
             : getMimeType(audio.format),
       });
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private async convertFsb(params: AudioClipGetResult, isPreview?: boolean) {
+    const { format, vbrQuality } = AudioClipLoader.convertSettings;
+    return convertFsb(
+      params,
+      isPreview ? FsbConvertFormat.WAV : format,
+      isPreview ? undefined : { vbrQuality: vbrQuality as any },
+    );
   }
 }

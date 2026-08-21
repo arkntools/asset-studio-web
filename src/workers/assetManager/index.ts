@@ -1,6 +1,5 @@
 import { AssetType, loadAssetBundle } from '@arkntools/unity-js';
 import type { AssetFile, AssetFileLoadOptions, AssetObject } from '@arkntools/unity-js';
-import type { FsbConvertFormat } from '@arkntools/unity-js/audio';
 import { FsaError, FsaErrorCode, FsaPromises } from '@tsuk1ko/fsa-promises';
 import { expose } from 'comlink';
 import { md5 as calcMd5 } from 'js-md5';
@@ -10,6 +9,7 @@ import { PromisePool } from '@/utils/promisePool';
 import { clearCache, createLoader } from './loaders';
 import type { AssetExportItem, PreviewInfo } from './loaders';
 import { AudioClipLoader } from './loaders/audioClip';
+import type { FsbConvertSettings } from './loaders/audioClip';
 import { RenameProcessor } from './utils/rename';
 
 export interface AssetInfo {
@@ -42,12 +42,8 @@ const THREAD_NUM = Math.max(navigator.hardwareConcurrency, 1);
 export class AssetManager {
   private bundleMap = new Map<string, AssetFile>();
 
-  static setFsbConverter(fsbConverter: (typeof AudioClipLoader)['fsbConverter']) {
-    AudioClipLoader.fsbConverter = fsbConverter;
-  }
-
-  static setFsbConvertFormat(fsbConvertFormat: FsbConvertFormat) {
-    AudioClipLoader.convertFormat = fsbConvertFormat;
+  static setFsbConvertSettings(settings: FsbConvertSettings) {
+    AudioClipLoader.convertSettings = settings;
   }
 
   clear() {
