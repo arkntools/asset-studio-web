@@ -17,11 +17,15 @@ body {
   --el-border-color: rgb(232, 234, 236);
 }
 
-.cell-overflow-visible {
-  overflow: visible !important;
-  > .vxe-cell,
-  > .vxe-cell > .vxe-cell--wrapper {
-    overflow: visible !important;
+.vxe-checkbox-cell {
+  .vxe-cell--wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .vxe-body-cell--wrapper {
+    margin-left: 1px;
   }
 }
 

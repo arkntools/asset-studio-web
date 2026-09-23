@@ -56,8 +56,8 @@
           :width="38"
           :resizable="false"
           fixed="left"
-          header-class-name="cell-overflow-visible"
-          class-name="cell-overflow-visible"
+          header-class-name="vxe-checkbox-cell vxe-checkbox-cell__header"
+          class-name="vxe-checkbox-cell"
         />
         <VxeColumn field="name" title="Name" fixed="left" :min-width="120" sortable :sort-by="sortNameMethod" />
         <VxeColumn field="fileName" title="From file" :min-width="60" sortable />
@@ -167,7 +167,8 @@ const multiSelectCannotExportNum = computed(() => multiSelectRows.value.filter(r
 
 let lastAssetInfo: AssetInfo | undefined;
 
-const updateMultiSelectNum = () => {
+const updateMultiSelectNum = async () => {
+  await sleep();
   multiSelectRows.value = tableRef.value!.getCheckboxRecords();
 };
 
