@@ -10,7 +10,7 @@ export class RenameProcessor {
       const curTimes = this.duplicateMap.get(name) || 0;
       if (!curTimes) {
         this.duplicateMap.set(name, 1);
-        return item;
+        return { ...item, name };
       }
       const newName = this.rename(name, curTimes);
       this.duplicateMap.set(newName, curTimes + 1);
