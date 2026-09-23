@@ -87,5 +87,9 @@ const assetPreviewSize = wrapStorage(useLocalStorage('app-panel-size-assetPrevie
       }
     }
   }
+
+  :deep(.el-splitter-panel) {
+    overflow: hidden;
+  }
 }
 </style>
