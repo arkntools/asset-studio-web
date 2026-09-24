@@ -1,5 +1,5 @@
 import type { MaybePromise, RepositoryItem, ResourceItem } from '@arkntools/as-web-repo';
-import { computedAsync, useLocalStorage } from '@vueuse/core';
+import { computedAsync, useArrayMap, useLocalStorage } from '@vueuse/core';
 import { isNotNil, keyBy, remove, retry } from 'es-toolkit';
 import { defineStore } from 'pinia';
 import { useRepoAvailable } from '@/hooks/useRepoAvailable';
@@ -128,6 +128,11 @@ export const useRepository = defineStore('repository', () => {
       onError: e => ElMessage({ message: String(e), type: 'error' }),
     },
   );
+
+  const curResListWithSearchStrings = useArrayMap(curResList, item => ({
+    ...item,
+    searchStrings: [item.name, ...(item.searchStrings || [])],
+  }));
 
   watch(curResList, () => {
     resProgressMap.clear();
@@ -266,7 +271,7 @@ export const useRepository = defineStore('repository', () => {
     repo: curRepo,
     repoId: curRepoId,
     repoList: readonly(curRepoList),
-    resList: curResList,
+    resList: curResListWithSearchStrings,
     resProgressMap: readonly(resProgressMap),
     dataHandler,
     getResource,

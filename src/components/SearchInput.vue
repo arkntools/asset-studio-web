@@ -64,14 +64,28 @@ const clear = () => {
   inputValue.value = '';
 };
 
-const doSearch = <T,>(list: T[], valueGetter: (item: T) => string[]) => {
+const doSearch = <T,>({
+  list,
+  valueGetter,
+  firstPriority = false,
+}: {
+  list: T[];
+  valueGetter: (item: T) => string[];
+  firstPriority?: boolean;
+}): T[] => {
   const searchRaw = search.value;
   if (!searchRaw) return list;
-  if (searchRaw instanceof RegExp) {
-    return list.filter(item => valueGetter(item).some(value => searchRaw.test(value)));
-  }
   const cs = isCaseSensitive.value;
-  return list.filter(item => valueGetter(item).some(value => (cs ? value : value.toLowerCase()).includes(searchRaw)));
+  const matches = (value: string) =>
+    searchRaw instanceof RegExp ? searchRaw.test(value) : (cs ? value : value.toLowerCase()).includes(searchRaw);
+  const firstMatches: T[] = [];
+  const otherMatches: T[] = [];
+  for (const item of list) {
+    const index = valueGetter(item).findIndex(matches);
+    if (index < 0) continue;
+    (firstPriority && index === 0 ? firstMatches : otherMatches).push(item);
+  }
+  return firstMatches.concat(otherMatches);
 };
 
 defineExpose({

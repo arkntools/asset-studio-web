@@ -154,7 +154,9 @@ const searchInputRef = useTemplateRef('searchInputRef');
 
 const searchValueGetter = (item: AssetInfo) => item.search;
 const searchedAssetInfos = computed(
-  () => searchInputRef.value?.doSearch(filteredAssetInfos.value, searchValueGetter) || filteredAssetInfos.value,
+  () =>
+    searchInputRef.value?.doSearch({ list: filteredAssetInfos.value, valueGetter: searchValueGetter }) ||
+    filteredAssetInfos.value,
 );
 
 const getAssetNameSortIndex = useNatsort(() => store.assetInfos.map(({ name }) => name));
