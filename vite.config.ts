@@ -30,10 +30,6 @@ const nodePolyfillPlugins = () =>
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
-  server: {
-    // Use Node's fs.watch on macOS; FSEvents can silently miss file changes.
-    watch: process.platform === 'darwin' ? { useFsEvents: false, usePolling: false } : undefined,
-  },
   build: {
     chunkSizeWarningLimit: 5000,
   },
